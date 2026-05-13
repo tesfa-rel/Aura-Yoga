@@ -418,7 +418,7 @@ const Home: React.FC = () => {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; 2024 AURA Yoga & Pilates Studio. All rights reserved. Women-only wellness space.</p>
+          <p>&copy; {new Date().getFullYear()} AURA Yoga & Pilates Studio. All rights reserved. Women-only wellness space.</p>
         </div>
       </footer>
     </>

@@ -22,20 +22,23 @@ const DashboardLayout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    if (!user) return;
+    const isAdmin = user.role === 'ADMIN';
+    const tabMap: Record<string, TabType> = isAdmin
+      ? { home: 'admin-dashboard', dashboard: 'admin-dashboard', classes: 'admin-classes', packages: 'admin-packages', bookings: 'admin-bookings', users: 'admin-users', payments: 'admin-payments' }
+      : { home: 'home', classes: 'classes', packages: 'packages', bookings: 'bookings', payments: 'payments' };
     const segments = location.pathname.split('/').filter(Boolean);
-    const tab = segments.length > 1 ? segments[1] as TabType : null;
-    if (tab) {
-      setActiveTab(tab);
+    const tab = segments.length > 1 ? segments[1] : null;
+    if (tab && tabMap[tab]) {
+      setActiveTab(tabMap[tab]);
+    } else if (isAdmin) {
+      setActiveTab('admin-dashboard');
     }
-  }, [location.pathname]);
+  }, [location.pathname, user]);
 
   if (!user) {
     return <Navigate to="/login" />;
   }
-
-  const handleLogout = () => {
-    logout();
-  };
 
   const isAdmin = user.role === 'ADMIN';
 
@@ -57,6 +60,10 @@ const DashboardLayout: React.FC = () => {
   ];
 
   const tabs = isAdmin ? adminTabs : userTabs;
+
+  const handleLogout = () => {
+    logout();
+  };
 
   const renderContent = () => {
     switch (activeTab) {

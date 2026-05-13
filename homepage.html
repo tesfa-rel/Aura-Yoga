@@ -14,10 +14,10 @@
         }
 
         :root {
-            --warm-sand: #987558;
+            --warm-sand: #98755B;
             --blush-linen: #E2D1C2;
             --deep-espresso: #442913;
-            --dusty-rose: #D4BAC0;
+            --dusty-rose: #D4BBAC;
             --sienna-brown: #5C3422;
             --text-dark: #2a2a2a;
             --text-light: #f5f5f5;
@@ -1311,11 +1311,14 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 AURA Yoga & Pilates Studio. All rights reserved. Women-only wellness space.</p>
+            <p>&copy; <span id="year"></span> AURA Yoga & Pilates Studio. All rights reserved. Women-only wellness space.</p>
         </div>
     </footer>
 
     <script>
+        // Set current year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
         // Mobile menu toggle
         const hamburgerBtn = document.getElementById('hamburgerBtn');
         const mobileMenu = document.getElementById('mobileMenu');
