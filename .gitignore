@@ -183,6 +183,9 @@ monitoring/
 # Scripts output
 scripts/output/
 
+# Vercel
+.vercel
+
 # Config files that may contain secrets
 config/local.json
 config/production.json
