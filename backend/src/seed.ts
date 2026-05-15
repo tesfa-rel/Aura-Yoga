@@ -44,11 +44,14 @@ async function main() {
   ];
 
   for (const pkg of packages) {
-    await prisma.package.upsert({
-      where: { name: pkg.name },
-      update: {},
-      create: pkg,
+    const existing = await prisma.package.findFirst({
+      where: { name: pkg.name }
     });
+    if (!existing) {
+      await prisma.package.create({
+        data: pkg,
+      });
+    }
   }
 
   // Create sample classes
@@ -96,17 +99,18 @@ async function main() {
   ];
 
   for (const cls of classes) {
-    await prisma.class.upsert({
-      where: { 
-        name_date_time: {
-          name: cls.name,
-          date: cls.date,
-          time: cls.time,
-        }
-      },
-      update: {},
-      create: cls,
+    const existing = await prisma.class.findFirst({
+      where: {
+        name: cls.name,
+        date: cls.date,
+        time: cls.time,
+      }
     });
+    if (!existing) {
+      await prisma.class.create({
+        data: cls,
+      });
+    }
   }
 
   console.log('Database seeded successfully!');
