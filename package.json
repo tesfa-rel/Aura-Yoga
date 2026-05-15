@@ -33,7 +33,7 @@
     "client": "react-scripts start",
     "eject": "react-scripts eject",
     "install-deps": "npm install --legacy-peer-deps && cd backend && npm install --legacy-peer-deps",
-    "vercel-build": "npm install --legacy-peer-deps && cd backend && npm install --legacy-peer-deps && npx prisma generate --schema=prisma/schema.prisma && npx prisma db push --schema=prisma/schema.prisma && npm run seed && npm run build && cd .. && rsync -av backend/dist/ api/dist/ && CI=false npm run build"
+    "vercel-build": "npm install --legacy-peer-deps && cd backend && npm install --legacy-peer-deps && npx prisma generate --schema=prisma/schema.prisma && npx prisma db push --schema=prisma/schema.prisma && npm run seed && npm run build && cd .. && node -e \"const fs = require('fs'); const path = require('path'); const src = path.join(__dirname, 'backend', 'dist'); const dest = path.join(__dirname, 'api', 'dist'); if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true}); const copyDir = (s, d) => { fs.readdirSync(s).forEach(f => { const srcPath = path.join(s, f); const destPath = path.join(d, f); if (fs.lstatSync(srcPath).isDirectory()) { if (!fs.existsSync(destPath)) fs.mkdirSync(destPath, {recursive: true}); copyDir(srcPath, destPath); } else { fs.copyFileSync(srcPath, destPath); } }); }; copyDir(src, dest);\" && CI=false npm run build"
   },
   "eslintConfig": {
     "extends": [
