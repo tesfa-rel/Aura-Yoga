@@ -55,17 +55,22 @@ router.get('/', [
         bookings: {
           select: {
             id: true,
+            status: true,
           },
         },
       },
     });
 
-    // Calculate available spots for each class
-    const classesWithAvailability = classes.map(cls => ({
-      ...cls,
-      availableSpots: cls.capacity - cls.bookings.length,
-      isFullyBooked: cls.capacity <= cls.bookings.length,
-    }));
+    // Calculate available spots for each class. Cancelled bookings free their
+    // spot, so only active bookings count toward capacity.
+    const classesWithAvailability = classes.map(cls => {
+      const activeBookings = cls.bookings.filter(b => b.status !== 'CANCELLED').length;
+      return {
+        ...cls,
+        availableSpots: cls.capacity - activeBookings,
+        isFullyBooked: cls.capacity <= activeBookings,
+      };
+    });
 
     res.json(classesWithAvailability);
   } catch (error) {
@@ -100,8 +105,9 @@ router.get('/:id', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Class not found' });
     }
 
-    // Calculate available spots
-    const availableSpots = classItem.capacity - classItem.bookings.length;
+    // Calculate available spots (cancelled bookings free their spot)
+    const activeBookings = classItem.bookings.filter(b => b.status !== 'CANCELLED').length;
+    const availableSpots = classItem.capacity - activeBookings;
 
     res.json({
       ...classItem,

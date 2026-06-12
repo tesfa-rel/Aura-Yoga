@@ -5,6 +5,7 @@ import path from 'path';
 import { prisma } from '../lib/prisma';
 import { authenticateToken } from '../middleware/auth';
 import { telegramService } from '../services/telegramService';
+import { promoteNextForClass } from '../services/waitlistService';
 
 // Extend Request interface to include user property
 interface AuthenticatedRequest extends Request {
@@ -87,12 +88,15 @@ router.post('/', authenticateToken, upload.single('paymentReceipt'), [
       return res.status(400).json({ error: 'Cannot book past classes' });
     }
 
-    // Check if class is fully booked
-    if (classItem.bookings.length >= classItem.capacity) {
+    // Check if class is fully booked (cancelled bookings free their spot)
+    const activeBookings = classItem.bookings.filter(b => b.status !== 'CANCELLED').length;
+    if (activeBookings >= classItem.capacity) {
       return res.status(400).json({ error: 'Class is fully booked' });
     }
 
-    // Check if user already booked this class
+    // Check if user already booked this class. A previously cancelled booking
+    // shouldn't block a fresh one — but the (userId, classId) unique constraint
+    // would, so we clear the stale cancelled row before re-booking.
     const existingBooking = await prisma.booking.findUnique({
       where: {
         userId_classId: {
@@ -103,7 +107,10 @@ router.post('/', authenticateToken, upload.single('paymentReceipt'), [
     });
 
     if (existingBooking) {
-      return res.status(400).json({ error: 'You have already booked this class' });
+      if (existingBooking.status !== 'CANCELLED') {
+        return res.status(400).json({ error: 'You have already booked this class' });
+      }
+      await prisma.booking.delete({ where: { id: existingBooking.id } });
     }
 
     // Package-based booking: consume one session from the user's earliest-expiring
@@ -155,6 +162,12 @@ router.post('/', authenticateToken, upload.single('paymentReceipt'), [
             error: 'No active package with available sessions. Please purchase a package or pay per class.',
           });
         }
+
+        // Booking succeeded — clear any waitlist entry the user held for it.
+        await prisma.waitlistEntry.updateMany({
+          where: { userId, classId, status: { in: ['WAITING', 'PROMOTED'] } },
+          data: { status: 'CANCELLED' },
+        });
 
         return res.status(201).json({
           message: 'Booking confirmed using 1 package session.',
@@ -252,6 +265,12 @@ router.post('/', authenticateToken, upload.single('paymentReceipt'), [
         // Continue with booking even if Telegram fails
       }
     }
+
+    // Booking succeeded — clear any waitlist entry the user held for it.
+    await prisma.waitlistEntry.updateMany({
+      where: { userId, classId, status: { in: ['WAITING', 'PROMOTED'] } },
+      data: { status: 'CANCELLED' },
+    });
 
     const message = paymentMethod === 'CASH' 
       ? 'Booking successful! Please pay at the studio to complete your booking.'
@@ -388,8 +407,8 @@ router.patch('/:id/cancel', authenticateToken, async (req: AuthenticatedRequest,
     // Cancel the booking and, if it was paid for with a package session, refund
     // that session back to the originating package — both in one transaction so a
     // refund is never applied without the cancellation (or vice versa).
-    const updatedBooking = await prisma.$transaction(async (tx) => {
-      const cancelled = await tx.booking.update({
+    const { cancelled, promoted } = await prisma.$transaction(async (tx) => {
+      const updated = await tx.booking.update({
         where: { id },
         data: {
           status: 'CANCELLED',
@@ -414,14 +433,34 @@ router.patch('/:id/cancel', authenticateToken, async (req: AuthenticatedRequest,
         });
       }
 
-      return cancelled;
+      // A spot just opened up — promote the next person on the waitlist.
+      const promotedEntry = await promoteNextForClass(tx, booking.classId);
+
+      return { cancelled: updated, promoted: promotedEntry };
     });
+
+    // Notify the promoted user (best-effort; never block the cancellation).
+    if (promoted) {
+      try {
+        await telegramService.sendBookingConfirmationNotification({
+          userName: promoted.user.name || 'Unknown User',
+          userEmail: promoted.user.email,
+          className: promoted.class.name,
+          classDate: new Date(promoted.class.date).toLocaleDateString(),
+          classTime: promoted.class.time,
+          paymentStatus: 'WAITLIST_PROMOTED',
+        });
+      } catch (notifyError) {
+        console.error('Waitlist promotion notification failed:', notifyError);
+      }
+    }
 
     res.json({
       message: booking.userPackageId
         ? 'Booking cancelled successfully. 1 session refunded to your package.'
         : 'Booking cancelled successfully',
-      booking: updatedBooking,
+      booking: cancelled,
+      waitlistPromoted: Boolean(promoted),
     });
   } catch (error) {
     console.error('Cancellation error:', error);
