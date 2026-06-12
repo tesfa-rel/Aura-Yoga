@@ -46,12 +46,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
+    const storedRefresh = localStorage.getItem('refreshToken');
 
     if (storedToken && storedUser) {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
     }
-    setLoading(false);
+
+    // Proactively rotate the access token on load so long-lived sessions stay valid.
+    if (storedRefresh) {
+      fetch('/api/auth/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken: storedRefresh }),
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.token) {
+            setToken(data.token);
+            localStorage.setItem('token', data.token);
+            if (data.refreshToken) {
+              localStorage.setItem('refreshToken', data.refreshToken);
+            }
+          }
+        })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -71,6 +94,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(data.user);
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
+        if (data.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
       } else {
         throw new Error(data.error || 'Login failed');
       }
@@ -96,6 +122,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(data.user);
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
+        if (data.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
       } else {
         throw new Error(data.error || 'Registration failed');
       }
@@ -105,10 +134,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
+    const storedRefresh = localStorage.getItem('refreshToken');
+    // Best-effort server-side revocation; clear local state regardless.
+    if (storedRefresh) {
+      fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken: storedRefresh }),
+      }).catch(() => {});
+    }
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('refreshToken');
   };
 
   const value: AuthContextType = {

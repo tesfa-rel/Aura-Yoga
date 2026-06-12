@@ -2,8 +2,17 @@ import express, { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { body, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
-import { generateToken } from '../middleware/auth';
 import { findUserByEmail, validatePassword } from '../mocks/mockAuth';
+import {
+  generateAccessToken,
+  issueRefreshToken,
+  rotateRefreshToken,
+  revokeRefreshToken,
+  revokeAllRefreshTokens,
+  issuePasswordResetToken,
+  consumePasswordResetToken,
+} from '../services/authTokenService';
+import { emailService } from '../services/emailService';
 
 const router = express.Router();
 
@@ -50,12 +59,14 @@ router.post('/register', [
       }
     });
 
-    const token = generateToken(user.id);
+    const token = generateAccessToken(user.id);
+    const refreshToken = await issueRefreshToken(user.id);
 
     res.status(201).json({
       message: 'User created successfully',
       user,
-      token
+      token,
+      refreshToken
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -107,7 +118,14 @@ router.post('/login', [
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const token = generateToken(user.id);
+    const token = generateAccessToken(user.id);
+    // Mock users aren't in the DB, so they can't have a persisted refresh token.
+    let refreshToken: string | undefined;
+    try {
+      refreshToken = await issueRefreshToken(user.id);
+    } catch (refreshError) {
+      console.log('Skipping refresh token issuance (likely a mock user)');
+    }
 
     res.json({
       message: 'Login successful',
@@ -117,10 +135,117 @@ router.post('/login', [
         name: user.name,
         role: user.role,
       },
-      token
+      token,
+      refreshToken
     });
   } catch (error) {
     console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Exchange a refresh token for a fresh access token (and rotate the refresh token)
+router.post('/refresh', [body('refreshToken').notEmpty()], async (req: Request, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { refreshToken } = req.body;
+    const rotated = await rotateRefreshToken(refreshToken);
+
+    if (!rotated) {
+      return res.status(401).json({ error: 'Invalid or expired refresh token' });
+    }
+
+    const token = generateAccessToken(rotated.userId);
+    res.json({ token, refreshToken: rotated.refreshToken });
+  } catch (error) {
+    console.error('Refresh error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Logout: revoke the supplied refresh token (idempotent)
+router.post('/logout', async (req: Request, res: Response) => {
+  try {
+    const { refreshToken } = req.body || {};
+    if (refreshToken) {
+      await revokeRefreshToken(refreshToken);
+    }
+    res.json({ message: 'Logged out' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Request a password reset link. Always returns 200 so the endpoint can't be
+// used to probe which emails are registered.
+router.post('/forgot-password', [body('email').isEmail().normalizeEmail()], async (req: Request, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    const response: { message: string; resetToken?: string } = {
+      message: 'If an account exists for that email, a reset link has been sent.',
+    };
+
+    if (user) {
+      const resetToken = await issuePasswordResetToken(user.id);
+      const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+      const resetUrl = `${clientUrl}/reset-password?token=${resetToken}`;
+      const sent = await emailService.sendPasswordResetEmail(user.email, resetUrl);
+
+      // When SMTP isn't configured (dev), surface the token so the flow is usable.
+      if (!sent && process.env.NODE_ENV !== 'production') {
+        response.resetToken = resetToken;
+      }
+    }
+
+    res.json(response);
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Complete a password reset using a valid token
+router.post('/reset-password', [
+  body('token').notEmpty(),
+  body('password').isLength({ min: 6 }),
+], async (req: Request, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { token, password } = req.body;
+    const userId = await consumePasswordResetToken(token);
+
+    if (!userId) {
+      return res.status(400).json({ error: 'Invalid or expired reset token' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    // Force re-login everywhere after a password change.
+    await revokeAllRefreshTokens(userId);
+
+    res.json({ message: 'Password has been reset. Please log in with your new password.' });
+  } catch (error) {
+    console.error('Reset password error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
