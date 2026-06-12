@@ -75,30 +75,23 @@ router.post('/purchase', authenticateToken, [
       return res.status(400).json({ error: 'Package is not available' });
     }
 
-    // Calculate expiry date
-    let expiresAt = null;
-    if (packageInfo.validityDays) {
-      const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + packageInfo.validityDays);
-      expiresAt = expiryDate;
-    }
-
-    // Create user package
-    const userPackage = await prisma.userPackage.create({
+    // A purchase creates a PENDING payment linked to the package. Sessions are
+    // only granted once an admin verifies the payment (see payment verify ->
+    // activateUserPackageFromPayment), which keeps the package economy honest.
+    const payment = await prisma.payment.create({
       data: {
         userId,
         packageId,
-        remainingSessions: packageInfo.sessionsCount,
-        expiresAt,
-      },
-      include: {
-        package: true,
+        amount: packageInfo.price,
+        paymentMethod: 'BANK_TRANSFER',
+        status: 'PENDING',
       },
     });
 
     res.status(201).json({
-      message: 'Package purchased successfully',
-      userPackage,
+      message:
+        'Purchase request created. Upload your payment receipt and your sessions will be activated once an admin verifies it.',
+      payment,
     });
   } catch (error) {
     console.error('Package purchase error:', error);

@@ -56,16 +56,18 @@ model Booking {
   status      String    @default("CONFIRMED")
   cancelledAt DateTime?
   paymentStatus String  @default("PENDING") // PENDING, PAID, FAILED
-  paymentMethod String? // BANK_TRANSFER, MOBILE_MONEY, CASH
+  paymentMethod String? // BANK_TRANSFER, MOBILE_MONEY, CASH, PACKAGE
   paymentAmount Float?
   paymentReceiptUrl String?
   paidAt      DateTime?
+  userPackageId String? // set when the booking consumed a package session
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   // Relations
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class       Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  userPackage UserPackage? @relation(fields: [userPackageId], references: [id])
 
   @@unique([userId, classId])
   @@map("bookings")
@@ -95,12 +97,14 @@ model UserPackage {
   packageId         String
   remainingSessions Int
   expiresAt         DateTime?
+  source            String    @default("PURCHASED") // PURCHASED, ADMIN_GRANTED
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
   // Relations
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  package Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package  Package   @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  bookings Booking[]
 
   @@map("user_packages")
 }

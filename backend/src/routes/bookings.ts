@@ -49,7 +49,7 @@ const upload = multer({
 // Create a booking with payment screenshot
 router.post('/', authenticateToken, upload.single('paymentReceipt'), [
   body('classId').notEmpty().withMessage('Class ID is required'),
-  body('paymentMethod').isIn(['BANK_TRANSFER', 'MOBILE_MONEY', 'CASH']).withMessage('Invalid payment method'),
+  body('paymentMethod').isIn(['BANK_TRANSFER', 'MOBILE_MONEY', 'CASH', 'PACKAGE']).withMessage('Invalid payment method'),
 ], async (req: AuthenticatedRequest, res: Response) => {
   try {
     const errors = validationResult(req);
@@ -61,8 +61,11 @@ router.post('/', authenticateToken, upload.single('paymentReceipt'), [
     const userId = req.user!.id;
     const paymentReceiptFile = req.file;
 
-    // Validate payment receipt requirement for non-cash payments
-    if (paymentMethod !== 'CASH' && !paymentReceiptFile) {
+    // Validate payment receipt requirement for transfer-based payments. CASH is
+    // paid in person and PACKAGE is covered by a prepaid session, so neither
+    // requires an uploaded receipt.
+    const requiresReceipt = paymentMethod === 'BANK_TRANSFER' || paymentMethod === 'MOBILE_MONEY';
+    if (requiresReceipt && !paymentReceiptFile) {
       return res.status(400).json({ error: 'Payment receipt is required for bank transfer and mobile money payments' });
     }
 
@@ -101,6 +104,67 @@ router.post('/', authenticateToken, upload.single('paymentReceipt'), [
 
     if (existingBooking) {
       return res.status(400).json({ error: 'You have already booked this class' });
+    }
+
+    // Package-based booking: consume one session from the user's earliest-expiring
+    // active package. Deduction + booking creation happen in a single transaction
+    // so a session can never be lost or double-spent.
+    if (paymentMethod === 'PACKAGE') {
+      try {
+        const packageBooking = await prisma.$transaction(async (tx) => {
+          const activePackage = await tx.userPackage.findFirst({
+            where: {
+              userId,
+              remainingSessions: { gt: 0 },
+              OR: [{ expiresAt: null }, { expiresAt: { gte: new Date() } }],
+            },
+            orderBy: [{ expiresAt: 'asc' }, { createdAt: 'asc' }],
+          });
+
+          if (!activePackage) {
+            return { error: 'no_sessions' as const };
+          }
+
+          await tx.userPackage.update({
+            where: { id: activePackage.id },
+            data: { remainingSessions: { decrement: 1 } },
+          });
+
+          const created = await tx.booking.create({
+            data: {
+              userId,
+              classId,
+              status: 'CONFIRMED',
+              paymentStatus: 'PAID',
+              paymentMethod: 'PACKAGE',
+              paymentAmount: 0,
+              paidAt: new Date(),
+              userPackageId: activePackage.id,
+            },
+            include: {
+              class: true,
+              user: { select: { id: true, name: true, email: true } },
+            },
+          });
+
+          return { booking: created, remainingSessions: activePackage.remainingSessions - 1 };
+        });
+
+        if ('error' in packageBooking) {
+          return res.status(400).json({
+            error: 'No active package with available sessions. Please purchase a package or pay per class.',
+          });
+        }
+
+        return res.status(201).json({
+          message: 'Booking confirmed using 1 package session.',
+          booking: packageBooking.booking,
+          remainingSessions: packageBooking.remainingSessions,
+        });
+      } catch (txError) {
+        console.error('Package booking error:', txError);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
     }
 
     // Prepare payment receipt URL
@@ -317,27 +381,46 @@ router.patch('/:id/cancel', authenticateToken, async (req: AuthenticatedRequest,
       return res.status(400).json({ error: 'Cannot cancel less than 2 hours before class' });
     }
 
-    // Update booking status
-    const updatedBooking = await prisma.booking.update({
-      where: { id },
-      data: {
-        status: 'CANCELLED',
-        cancelledAt: new Date(),
-      },
-      include: {
-        class: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+    if (booking.status === 'CANCELLED') {
+      return res.status(400).json({ error: 'Booking is already cancelled' });
+    }
+
+    // Cancel the booking and, if it was paid for with a package session, refund
+    // that session back to the originating package — both in one transaction so a
+    // refund is never applied without the cancellation (or vice versa).
+    const updatedBooking = await prisma.$transaction(async (tx) => {
+      const cancelled = await tx.booking.update({
+        where: { id },
+        data: {
+          status: 'CANCELLED',
+          cancelledAt: new Date(),
+        },
+        include: {
+          class: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
           },
         },
-      },
+      });
+
+      if (booking.userPackageId) {
+        await tx.userPackage.update({
+          where: { id: booking.userPackageId },
+          data: { remainingSessions: { increment: 1 } },
+        });
+      }
+
+      return cancelled;
     });
 
     res.json({
-      message: 'Booking cancelled successfully',
+      message: booking.userPackageId
+        ? 'Booking cancelled successfully. 1 session refunded to your package.'
+        : 'Booking cancelled successfully',
       booking: updatedBooking,
     });
   } catch (error) {

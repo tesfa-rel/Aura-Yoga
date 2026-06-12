@@ -14,6 +14,7 @@ interface BookingModalProps {
     price?: number;
   } | null;
   loading?: boolean;
+  availableSessions?: number;
 }
 
 const BookingModal: React.FC<BookingModalProps> = ({
@@ -22,18 +23,32 @@ const BookingModal: React.FC<BookingModalProps> = ({
   onConfirm,
   classInfo,
   loading = false,
+  availableSessions = 0,
 }) => {
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('BANK_TRANSFER');
+  const hasSessions = availableSessions > 0;
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(
+    hasSessions ? 'PACKAGE' : 'BANK_TRANSFER'
+  );
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState<string>('');
 
   if (!isOpen || !classInfo) return null;
 
   const paymentMethods = [
+    ...(hasSessions
+      ? [{
+          value: 'PACKAGE',
+          label: `Use a package session (${availableSessions} left)`,
+          description: 'Redeem one prepaid session from your active package',
+        }]
+      : []),
     { value: 'BANK_TRANSFER', label: 'Bank Transfer', description: 'Transfer to our bank account' },
     { value: 'MOBILE_MONEY', label: 'Mobile Money', description: 'Telebirr, M-Pesa, or other mobile money' },
     { value: 'CASH', label: 'Cash Payment', description: 'Pay in person at the studio' },
   ];
+
+  const receiptRequired =
+    selectedPaymentMethod === 'BANK_TRANSFER' || selectedPaymentMethod === 'MOBILE_MONEY';
 
   const bankDetails = {
     accountName: 'AURA Yoga Studio',
@@ -64,8 +79,8 @@ const BookingModal: React.FC<BookingModalProps> = ({
   };
 
   const handleConfirm = () => {
-    // Validate receipt requirement for non-cash payments
-    if (selectedPaymentMethod !== 'CASH' && !receiptFile) {
+    // Receipt is only required for transfer-based payments.
+    if (receiptRequired && !receiptFile) {
       setUploadError('Payment receipt is required for bank transfer and mobile money payments');
       return;
     }
@@ -152,8 +167,18 @@ const BookingModal: React.FC<BookingModalProps> = ({
               </div>
             )}
 
-            {/* Receipt Upload for Non-Cash Payments */}
-            {selectedPaymentMethod !== 'CASH' && (
+            {selectedPaymentMethod === 'PACKAGE' && (
+              <div className="mt-3 bg-purple-50 border border-purple-200 rounded-md p-3">
+                <p className="text-xs font-medium text-purple-900 mb-1">Package Session</p>
+                <p className="text-xs text-purple-700">
+                  1 session will be deducted from your package. You can cancel up to 2 hours before the
+                  class to get the session back.
+                </p>
+              </div>
+            )}
+
+            {/* Receipt Upload for transfer-based payments */}
+            {receiptRequired && (
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Payment Receipt *
@@ -206,7 +231,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
             </button>
             <button
               onClick={handleConfirm}
-              disabled={loading || (selectedPaymentMethod !== 'CASH' && !receiptFile)}
+              disabled={loading || (receiptRequired && !receiptFile)}
               className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Booking...' : 'Confirm Booking'}

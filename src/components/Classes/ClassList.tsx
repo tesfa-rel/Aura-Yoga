@@ -29,6 +29,7 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [availableSessions, setAvailableSessions] = useState(0);
   const [filters, setFilters] = useState({
     date: '',
     classType: '',
@@ -38,6 +39,28 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
   useEffect(() => {
     fetchClasses();
   }, [filters]);
+
+  useEffect(() => {
+    fetchAvailableSessions();
+  }, []);
+
+  const fetchAvailableSessions = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const response = await fetch('/api/packages/my-packages', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      const total = (Array.isArray(data) ? data : [])
+        .filter((up: any) => up.remainingSessions > 0 && (!up.expiresAt || new Date(up.expiresAt) >= new Date()))
+        .reduce((sum: number, up: any) => sum + up.remainingSessions, 0);
+      setAvailableSessions(total);
+    } catch (err) {
+      // Non-fatal: fall back to pay-per-class booking options.
+    }
+  };
 
   const fetchClasses = async () => {
     try {
@@ -106,7 +129,13 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
       const data = await response.json();
 
       if (response.ok) {
-        if (paymentMethod === 'CASH') {
+        if (paymentMethod === 'PACKAGE') {
+          setSuccessMessage(
+            typeof data.remainingSessions === 'number'
+              ? `Booking confirmed using 1 package session. ${data.remainingSessions} session(s) remaining.`
+              : 'Booking confirmed using 1 package session.'
+          );
+        } else if (paymentMethod === 'CASH') {
           setSuccessMessage('Booking successful! Please pay at the studio to complete your booking.');
         } else {
           setSuccessMessage('Booking successful! Payment receipt sent to admin for verification.');
@@ -115,6 +144,7 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
         setSelectedClass(null);
         // Refresh classes to update availability
         fetchClasses();
+        fetchAvailableSessions();
         
         // Clear success message after 5 seconds
         setTimeout(() => setSuccessMessage(''), 5000);
@@ -239,6 +269,7 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
 
       {/* Booking Modal */}
       <BookingModal
+        key={showBookingModal ? selectedClass?.id ?? 'modal' : 'closed'}
         isOpen={showBookingModal}
         onClose={handleCloseModal}
         onConfirm={handleConfirmBooking}
@@ -250,6 +281,7 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
           duration: selectedClass.duration,
         } : null}
         loading={bookingLoading}
+        availableSessions={availableSessions}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import path from 'path';
 import { body, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { activateUserPackageFromPayment } from '../services/packageActivationService';
 
 // Extend Request interface to include user property
 interface AuthenticatedRequest extends Request {
@@ -195,26 +196,34 @@ router.patch('/:id/verify', authenticateToken, requireAdmin, [
       return res.status(400).json({ error: 'Payment has already been processed' });
     }
 
-    const updatedPayment = await prisma.payment.update({
-      where: { id },
-      data: {
-        status,
-        verifiedAt: status === 'VERIFIED' ? new Date() : null,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+    const { updatedPayment, userPackage } = await prisma.$transaction(async (tx) => {
+      const updated = await tx.payment.update({
+        where: { id },
+        data: {
+          status,
+          verifiedAt: status === 'VERIFIED' ? new Date() : null,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
           },
         },
-      },
+      });
+
+      const activated =
+        status === 'VERIFIED' ? await activateUserPackageFromPayment(tx, updated) : null;
+
+      return { updatedPayment: updated, userPackage: activated };
     });
 
     res.json({
       message: `Payment ${status.toLowerCase()} successfully`,
       payment: updatedPayment,
+      packageActivated: Boolean(userPackage),
     });
   } catch (error) {
     console.error('Payment verification error:', error);

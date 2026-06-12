@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { activateUserPackageFromPayment } from '../services/packageActivationService';
 
 // Extend Request interface to include user property
 interface AuthenticatedRequest extends Request {
@@ -427,15 +428,50 @@ router.patch('/payments/:id/verify', authenticateToken, requireAdmin, async (req
     const { id } = req.params;
     const { status } = req.body;
 
-    const payment = await prisma.payment.update({
-      where: { id },
-      data: {
-        status,
-        verifiedAt: status === 'VERIFIED' ? new Date() : null,
-      },
+    if (status !== 'VERIFIED' && status !== 'REJECTED') {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const existing = await tx.payment.findUnique({ where: { id } });
+
+      if (!existing) {
+        return { error: 'not_found' as const };
+      }
+
+      // Only act on still-pending payments so verification (and the resulting
+      // package grant) runs exactly once.
+      if (existing.status !== 'PENDING') {
+        return { error: 'already_processed' as const };
+      }
+
+      const payment = await tx.payment.update({
+        where: { id },
+        data: {
+          status,
+          verifiedAt: status === 'VERIFIED' ? new Date() : null,
+        },
+      });
+
+      let userPackage = null;
+      if (status === 'VERIFIED') {
+        userPackage = await activateUserPackageFromPayment(tx, payment);
+      }
+
+      return { payment, userPackage };
     });
 
-    res.json({ message: `Payment ${status.toLowerCase()} successfully` });
+    if ('error' in result) {
+      if (result.error === 'not_found') {
+        return res.status(404).json({ error: 'Payment not found' });
+      }
+      return res.status(400).json({ error: 'Payment has already been processed' });
+    }
+
+    res.json({
+      message: `Payment ${status.toLowerCase()} successfully`,
+      packageActivated: Boolean(result.userPackage),
+    });
   } catch (error) {
     console.error('Error verifying payment:', error);
     res.status(500).json({ error: 'Internal server error' });

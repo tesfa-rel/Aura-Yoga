@@ -87,12 +87,15 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
       const data = await response.json();
 
       if (response.ok) {
-        setSuccessMessage('Package purchased successfully!');
+        setSuccessMessage(
+          data.message ||
+            'Purchase request created. Your sessions will be activated once your payment is verified.'
+        );
         // Refresh user packages
         fetchData();
         
-        // Clear success message after 3 seconds
-        setTimeout(() => setSuccessMessage(''), 3000);
+        // Clear success message after 6 seconds
+        setTimeout(() => setSuccessMessage(''), 6000);
       } else {
         setError(data.error || 'Purchase failed');
       }
