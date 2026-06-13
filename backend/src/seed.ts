@@ -1,19 +1,40 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { supabase } from './lib/supabase';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create admin user
-  const hashedPassword = await bcrypt.hash('admin123', 10);
-  
+  const adminEmail = 'admin@aura-yoga.com';
+  let adminId: string | undefined;
+
+  // Try to create admin in Supabase Auth first
+  try {
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email: adminEmail,
+      password: 'admin123',
+      email_confirm: true,
+      user_metadata: { name: 'AURA Admin', role: 'ADMIN' },
+    });
+
+    if (authError) {
+      console.log('Supabase admin creation skipped (may already exist or not configured):', authError.message);
+    }
+
+    if (authData?.user) {
+      adminId = authData.user.id;
+    }
+  } catch (e) {
+    console.log('Supabase not configured, seeding Prisma profile only');
+  }
+
+  // Create or update admin Prisma profile
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@aura-yoga.com' },
+    where: { email: adminEmail },
     update: {},
     create: {
-      email: 'admin@aura-yoga.com',
+      id: adminId || 'admin-seed-id',
+      email: adminEmail,
       name: 'AURA Admin',
-      password: hashedPassword,
       role: 'ADMIN',
     },
   });
