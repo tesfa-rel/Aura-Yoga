@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { supabase } from '../lib/supabase';
 import { body, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
 import { authenticateToken } from '../middleware/auth';
@@ -436,7 +437,7 @@ router.post('/instructor',
 
       const { name, email, password, phone } = req.body;
 
-      // Check if user already exists
+      // Check if user already exists in Prisma or Supabase
       const existingUser = await prisma.user.findUnique({
         where: { email }
       });
@@ -445,12 +446,24 @@ router.post('/instructor',
         return res.status(400).json({ error: 'User with this email already exists' });
       }
 
-      // Create instructor
+      // Create instructor in Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { name, phone, role: 'INSTRUCTOR' },
+      });
+
+      if (authError || !authData.user) {
+        return res.status(400).json({ error: authError?.message || 'Failed to create instructor account' });
+      }
+
+      // Create instructor profile in Prisma
       const instructor = await prisma.user.create({
         data: {
+          id: authData.user.id,
           name,
           email,
-          password, // In production, this should be hashed
           phone,
           role: 'INSTRUCTOR'
         },
