@@ -1,32 +1,45 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
 
 const ResetPassword: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get('token') || '';
   const navigate = useNavigate();
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [hasRecoveryToken, setHasRecoveryToken] = useState(false);
+
+  useEffect(() => {
+    // Supabase recovery links include access_token & refresh_token in the URL hash
+    // e.g. /reset-password#access_token=xxx&type=recovery
+    supabase.auth.onAuthStateChange((event: string, session: any) => {
+      if (event === 'PASSWORD_RECOVERY' && session) {
+        setHasRecoveryToken(true);
+      }
+    });
+
+    // Also check if there's already a recovery session in the URL
+    supabase.auth.getSession().then(({ data }: { data: { session: any } }) => {
+      if (data.session) {
+        setHasRecoveryToken(true);
+      }
+    });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setMessage('');
 
-    if (!token) {
-      setError('Missing reset token. Please use the link from your email.');
-      return;
-    }
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError('Passwords do not match');
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+      setError('Password must be at least 6 characters');
       return;
     }
 

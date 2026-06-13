@@ -85,7 +85,6 @@ const ForgotPassword: React.FC = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-
           <div>
             <button
               type="submit"
