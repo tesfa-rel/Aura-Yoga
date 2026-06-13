@@ -18,9 +18,11 @@ interface Class {
 interface ClassCardProps {
   classItem: Class;
   onBook?: (classId: string) => void;
+  onJoinWaitlist?: (classId: string) => void;
+  onWaitlist?: boolean;
 }
 
-const ClassCard: React.FC<ClassCardProps> = ({ classItem, onBook }) => {
+const ClassCard: React.FC<ClassCardProps> = ({ classItem, onBook, onJoinWaitlist, onWaitlist = false }) => {
   const classTypeColors = {
     YOGA: 'bg-purple-100 text-purple-800',
     PILATES: 'bg-pink-100 text-pink-800',
@@ -80,17 +82,26 @@ const ClassCard: React.FC<ClassCardProps> = ({ classItem, onBook }) => {
           {classItem.isFullyBooked ? 'Fully Booked' : `${classItem.availableSpots} spots left`}
         </div>
         
-        <button
-          onClick={handleBookClick}
-          disabled={classItem.isFullyBooked}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-            classItem.isFullyBooked
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2'
-          }`}
-        >
-          {classItem.isFullyBooked ? 'Booked' : 'Book Now'}
-        </button>
+        {classItem.isFullyBooked ? (
+          <button
+            onClick={() => onJoinWaitlist && !onWaitlist && onJoinWaitlist(classItem.id)}
+            disabled={onWaitlist}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+              onWaitlist
+                ? 'bg-amber-100 text-amber-700 cursor-default'
+                : 'bg-amber-500 text-white hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2'
+            }`}
+          >
+            {onWaitlist ? 'On Waitlist' : 'Join Waitlist'}
+          </button>
+        ) : (
+          <button
+            onClick={handleBookClick}
+            className="px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+          >
+            Book Now
+          </button>
+        )}
       </div>
     </div>
   );

@@ -35,11 +35,56 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
     instructor: '',
   });
   const [activePackages, setActivePackages] = useState<{ id: string; name: string; remainingSessions: number }[]>([]);
+  const [waitlistedClassIds, setWaitlistedClassIds] = useState<string[]>([]);
 
   useEffect(() => {
     fetchClasses();
     fetchActivePackages();
   }, [filters]);
+
+  useEffect(() => {
+    fetchWaitlist();
+  }, []);
+
+  const fetchWaitlist = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const response = await fetch('/api/waitlist/my-waitlist', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      setWaitlistedClassIds((Array.isArray(data) ? data : []).map((e: any) => e.classId));
+    } catch (err) {
+      // Non-fatal.
+    }
+  };
+
+  const handleJoinWaitlist = async (classId: string) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('Please log in to join the waitlist');
+      return;
+    }
+    try {
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ classId }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setSuccessMessage(data.message || 'Added to the waitlist.');
+        fetchWaitlist();
+        setTimeout(() => setSuccessMessage(''), 5000);
+      } else {
+        setError(data.error || 'Failed to join waitlist');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+    }
+  };
 
   const fetchActivePackages = async () => {
     try {
@@ -257,6 +302,8 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
               key={classItem.id}
               classItem={classItem}
               onBook={handleBookClick}
+              onJoinWaitlist={handleJoinWaitlist}
+              onWaitlist={waitlistedClassIds.includes(classItem.id)}
             />
           ))}
         </div>

@@ -5,6 +5,7 @@ import path from 'path';
 import { prisma } from '../lib/prisma';
 import { authenticateToken } from '../middleware/auth';
 import { telegramService } from '../services/telegramService';
+import { promoteNextForClass } from '../services/waitlistService';
 
 // Extend Request interface to include user property
 interface AuthenticatedRequest extends Request {
@@ -80,8 +81,9 @@ router.post('/', authenticateToken, upload.single('paymentReceipt'), [
       return res.status(400).json({ error: 'Cannot book past classes' });
     }
 
-    // Check if class is fully booked
-    if (classItem.bookings.length >= classItem.capacity) {
+    // Check if class is fully booked (cancelled bookings do not hold a spot)
+    const activeBookings = classItem.bookings.filter((b) => b.status !== 'CANCELLED');
+    if (activeBookings.length >= classItem.capacity) {
       return res.status(400).json({ error: 'Class is fully booked' });
     }
 
@@ -374,36 +376,46 @@ router.patch('/:id/cancel', authenticateToken, async (req: AuthenticatedRequest,
       return res.status(400).json({ error: 'Cannot cancel less than 2 hours before class' });
     }
 
-    // Refund package session if one was used
-    if (booking.userPackageId) {
-      await prisma.userPackage.update({
-        where: { id: booking.userPackageId },
-        data: { remainingSessions: { increment: 1 } },
-      });
-    }
+    // Cancel the booking, refund any package session, and promote the next
+    // waitlisted member — all in one transaction so a promotion is never
+    // recorded without the spot actually freeing up.
+    const { updatedBooking, promoted } = await prisma.$transaction(async (tx) => {
+      if (booking.userPackageId) {
+        await tx.userPackage.update({
+          where: { id: booking.userPackageId },
+          data: { remainingSessions: { increment: 1 } },
+        });
+      }
 
-    // Update booking status
-    const updatedBooking = await prisma.booking.update({
-      where: { id },
-      data: {
-        status: 'CANCELLED',
-        cancelledAt: new Date(),
-      },
-      include: {
-        class: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+      const updatedBooking = await tx.booking.update({
+        where: { id },
+        data: {
+          status: 'CANCELLED',
+          cancelledAt: new Date(),
+        },
+        include: {
+          class: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
           },
         },
-      },
+      });
+
+      const promoted = await promoteNextForClass(tx, booking.classId);
+
+      return { updatedBooking, promoted };
     });
 
     res.json({
       message: 'Booking cancelled successfully',
       booking: updatedBooking,
+      promotedFromWaitlist: promoted
+        ? { userId: promoted.userId, classId: promoted.classId }
+        : null,
     });
   } catch (error) {
     console.error('Cancellation error:', error);

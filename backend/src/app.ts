@@ -12,6 +12,7 @@ import paymentsRoutes from './routes/payments';
 import adminRoutes from './routes/admin';
 import usersRoutes from './routes/users';
 import notificationsRoutes from './routes/notifications';
+import waitlistRoutes from './routes/waitlist';
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use('/api/payments', paymentsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/notifications', notificationsRoutes);
+app.use('/api/waitlist', waitlistRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

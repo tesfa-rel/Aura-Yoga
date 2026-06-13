@@ -53,6 +53,9 @@ router.get('/', [
       ],
       include: {
         bookings: {
+          where: {
+            status: { not: 'CANCELLED' },
+          },
           select: {
             id: true,
           },
@@ -83,6 +86,9 @@ router.get('/:id', async (req: Request, res: Response) => {
       where: { id },
       include: {
         bookings: {
+          where: {
+            status: { not: 'CANCELLED' },
+          },
           include: {
             user: {
               select: {
