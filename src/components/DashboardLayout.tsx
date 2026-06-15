@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate, useLocation } from 'react-router-dom';
 import Home from './Homepage/Home';
@@ -12,14 +12,31 @@ import UserManagement from './Admin/UserManagement';
 import BookingManagement from './Admin/BookingManagement';
 import PackageManagement from './Admin/PackageManagement';
 import PaymentManagement from './Admin/PaymentManagement';
+import MobileBottomNav from './Layout/MobileBottomNav';
+import DesktopSidebar from './Layout/DesktopSidebar';
+import TabletSidebar from './Layout/TabletSidebar';
+import {
+  HomeIcon,
+  ClassesIcon,
+  PackagesIcon,
+  BookingsIcon,
+  PaymentsIcon,
+  DashboardIcon,
+  UsersIcon,
+} from './Layout/TabIcons';
 
 type TabType = 'home' | 'classes' | 'packages' | 'bookings' | 'payments' | 'admin-dashboard' | 'admin-classes' | 'admin-users' | 'admin-bookings' | 'admin-packages' | 'admin-payments';
+
+interface TabDef {
+  id: TabType;
+  label: string;
+  icon: React.ReactNode;
+}
 
 const DashboardLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<TabType>('home');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -42,22 +59,22 @@ const DashboardLayout: React.FC = () => {
 
   const isAdmin = user.role === 'ADMIN';
 
-  const userTabs: { id: TabType; label: string }[] = [
-    { id: 'home', label: 'Home' },
-    { id: 'classes', label: 'Classes' },
-    { id: 'packages', label: 'Packages' },
-    { id: 'bookings', label: 'My Bookings' },
-    { id: 'payments', label: 'My Payments' },
-  ];
+  const userTabs: TabDef[] = useMemo(() => [
+    { id: 'home', label: 'Home', icon: <HomeIcon className="w-5 h-5" /> },
+    { id: 'classes', label: 'Classes', icon: <ClassesIcon className="w-5 h-5" /> },
+    { id: 'packages', label: 'Packages', icon: <PackagesIcon className="w-5 h-5" /> },
+    { id: 'bookings', label: 'Bookings', icon: <BookingsIcon className="w-5 h-5" /> },
+    { id: 'payments', label: 'Payments', icon: <PaymentsIcon className="w-5 h-5" /> },
+  ], []);
 
-  const adminTabs: { id: TabType; label: string }[] = [
-    { id: 'admin-dashboard', label: 'Dashboard' },
-    { id: 'admin-classes', label: 'Classes' },
-    { id: 'admin-packages', label: 'Packages' },
-    { id: 'admin-bookings', label: 'Bookings' },
-    { id: 'admin-users', label: 'Users' },
-    { id: 'admin-payments', label: 'Payments' },
-  ];
+  const adminTabs: TabDef[] = useMemo(() => [
+    { id: 'admin-dashboard', label: 'Dashboard', icon: <DashboardIcon className="w-5 h-5" /> },
+    { id: 'admin-classes', label: 'Classes', icon: <ClassesIcon className="w-5 h-5" /> },
+    { id: 'admin-packages', label: 'Packages', icon: <PackagesIcon className="w-5 h-5" /> },
+    { id: 'admin-bookings', label: 'Bookings', icon: <BookingsIcon className="w-5 h-5" /> },
+    { id: 'admin-users', label: 'Users', icon: <UsersIcon className="w-5 h-5" /> },
+    { id: 'admin-payments', label: 'Payments', icon: <PaymentsIcon className="w-5 h-5" /> },
+  ], []);
 
   const tabs = isAdmin ? adminTabs : userTabs;
 
@@ -65,195 +82,86 @@ const DashboardLayout: React.FC = () => {
     logout();
   };
 
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId as TabType);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const renderContent = () => {
-    switch (activeTab) {
-      case 'home':
-        return <Home />;
-      case 'classes':
-        return (
-          <div className="pt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-              <ClassList />
-            </div>
-          </div>
-        );
-      case 'packages':
-        return (
-          <div className="pt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-              <PackageList />
-            </div>
-          </div>
-        );
-      case 'bookings':
-        return (
-          <div className="pt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-              <BookingHistory />
-            </div>
-          </div>
-        );
-      case 'payments':
-        return (
-          <div className="pt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-              <PaymentHistory />
-            </div>
-          </div>
-        );
-      case 'admin-dashboard':
-        return (
-          <div className="pt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-              <AdminDashboardPage />
-            </div>
-          </div>
-        );
-      case 'admin-classes':
-        return (
-          <div className="pt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-              <ClassManagement />
-            </div>
-          </div>
-        );
-      case 'admin-users':
-        return (
-          <div className="pt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-              <UserManagement />
-            </div>
-          </div>
-        );
-      case 'admin-bookings':
-        return (
-          <div className="pt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-              <BookingManagement />
-            </div>
-          </div>
-        );
-      case 'admin-packages':
-        return (
-          <div className="pt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-              <PackageManagement />
-            </div>
-          </div>
-        );
-      case 'admin-payments':
-        return (
-          <div className="pt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-              <PaymentManagement />
-            </div>
-          </div>
-        );
-      default:
-        return isAdmin ? (
-          <div className="pt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-              <AdminDashboardPage />
-            </div>
-          </div>
-        ) : (
-          <Home />
-        );
-    }
+    const content = (() => {
+      switch (activeTab) {
+        case 'home': return <Home />;
+        case 'classes': return <ClassList />;
+        case 'packages': return <PackageList />;
+        case 'bookings': return <BookingHistory />;
+        case 'payments': return <PaymentHistory />;
+        case 'admin-dashboard': return <AdminDashboardPage />;
+        case 'admin-classes': return <ClassManagement />;
+        case 'admin-users': return <UserManagement />;
+        case 'admin-bookings': return <BookingManagement />;
+        case 'admin-packages': return <PackageManagement />;
+        case 'admin-payments': return <PaymentManagement />;
+        default: return isAdmin ? <AdminDashboardPage /> : <Home />;
+      }
+    })();
+
+    return (
+      <main className="flex-1 min-w-0">
+        <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
+          {content}
+        </div>
+      </main>
+    );
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header Navigation */}
-      <nav className="bg-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <div className="flex-shrink-0 flex items-center">
-                <h1 className="text-xl sm:text-2xl font-bold text-purple-600">AURA Yoga</h1>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Desktop Sidebar (lg+) */}
+      <DesktopSidebar
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        userName={user.name}
+        onLogout={handleLogout}
+      />
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex md:items-center md:space-x-4">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                    activeTab === tab.id ? 'text-purple-600 bg-purple-50' : ''
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-              <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-gray-200">
-                <span className="text-sm text-gray-600">Welcome, {user.name}</span>
-                <button
-                  onClick={handleLogout}
-                  className="bg-purple-600 text-white px-3 py-1 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
+      {/* Tablet Sidebar (md - lg) */}
+      <TabletSidebar
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        userName={user.name}
+        onLogout={handleLogout}
+      />
 
-            {/* Mobile menu button */}
-            <div className="md:hidden flex items-center">
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-purple-600 hover:bg-gray-100 focus:outline-none"
-              >
-                <span className="sr-only">Open main menu</span>
-                {!isMobileMenuOpen ? (
-                  <svg className="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                ) : (
-                  <svg className="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                )}
-              </button>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile Header - only visible on mobile */}
+        <header className="md:hidden bg-white border-b border-gray-200 sticky top-0 z-40">
+          <div className="flex items-center justify-between h-14 px-4">
+            <h1 className="text-lg font-bold text-purple-600">AURA Yoga</h1>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                <span className="text-sm font-semibold text-purple-600">
+                  {user.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
             </div>
           </div>
+        </header>
+
+        {/* Content */}
+        <div className="flex-1 pb-20 md:pb-0 overflow-y-auto">
+          {renderContent()}
         </div>
-
-        {/* Mobile menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
-              <div className="px-3 py-2 border-b border-gray-200">
-                <p className="text-sm font-medium text-gray-900">Welcome, {user.name}</p>
-                <p className="text-xs text-gray-500">{user.email}</p>
-              </div>
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => { setActiveTab(tab.id); setIsMobileMenuOpen(false); }}
-                  className={`w-full text-left text-gray-700 hover:text-purple-600 hover:bg-gray-50 block px-3 py-2 rounded-md text-base font-medium ${
-                    activeTab === tab.id ? 'text-purple-600 bg-purple-50' : ''
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-              <button
-                onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
-                className="w-full text-left text-gray-700 hover:text-purple-600 hover:bg-gray-50 block px-3 py-2 rounded-md text-base font-medium"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* Content Area */}
-      <div className={activeTab === 'home' ? 'pt-14' : ''}>
-        {renderContent()}
       </div>
+
+      {/* Mobile Bottom Tab Bar */}
+      <MobileBottomNav
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+      />
     </div>
   );
 };
