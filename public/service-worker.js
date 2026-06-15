@@ -1,74 +1,114 @@
-const CACHE_NAME = 'aura-yoga-v1';
-const urlsToCache = [
+const CACHE_NAME = 'aura-yoga-v2';
+const STATIC_CACHE = 'aura-yoga-static-v2';
+const API_CACHE = 'aura-yoga-api-v2';
+
+const staticUrlsToCache = [
   '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
+  '/offline.html',
   '/manifest.json',
-  '/favicon.ico'
+  '/favicon.ico',
+  '/logo192.svg',
+  '/logo512.svg',
+  '/index.html'
 ];
 
-// Install event - cache resources
+// Install event - cache static assets
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches.open(STATIC_CACHE)
       .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        console.log('[SW] Caching static assets');
+        return cache.addAll(staticUrlsToCache);
       })
+      .catch(err => console.warn('[SW] Static cache failed:', err))
   );
 });
 
-// Fetch event - serve cached content when offline
+// Fetch event - cache-first for static, network-first for API, offline fallback
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
+  const { request } = event;
+  const url = new URL(request.url);
 
-        // Clone the request
-        const fetchRequest = event.request.clone();
+  // Skip non-GET requests
+  if (request.method !== 'GET') {
+    return;
+  }
 
-        return fetch(fetchRequest).then(
-          (response) => {
-            // Check if valid response
-            if(!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
+  // Skip chrome-extension and other non-http(s) requests
+  if (!url.protocol.startsWith('http')) {
+    return;
+  }
 
-            // Clone the response
-            const responseToCache = response.clone();
+  // API requests: network-first with cache fallback
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(handleApiRequest(request));
+    return;
+  }
 
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                // Cache API responses for offline use
-                if (event.request.url.includes('/api/')) {
-                  cache.put(event.request, responseToCache);
-                }
-              });
-
-            return response;
-          }
-        ).catch(() => {
-          // Offline fallback for API requests
-          if (event.request.url.includes('/api/')) {
-            return new Response(
-              JSON.stringify({ 
-                error: 'Offline - cached data shown',
-                offline: true 
-              }),
-              {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' }
-              }
-            );
-          }
-        });
-      })
-  );
+  // Static assets: cache-first with network fallback
+  event.respondWith(handleStaticRequest(request));
 });
+
+async function handleStaticRequest(request) {
+  const cache = await caches.open(STATIC_CACHE);
+  const cached = await cache.match(request);
+
+  if (cached) {
+    // Refresh cache in background
+    fetch(request).then(response => {
+      if (response && response.ok) {
+        cache.put(request, response.clone());
+      }
+    }).catch(() => {});
+    return cached;
+  }
+
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) {
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    // Offline fallback for navigation requests
+    if (request.mode === 'navigate') {
+      const offlinePage = await cache.match('/offline.html');
+      if (offlinePage) return offlinePage;
+    }
+    throw error;
+  }
+}
+
+async function handleApiRequest(request) {
+  const cache = await caches.open(API_CACHE);
+
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) {
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    const cached = await cache.match(request);
+    if (cached) {
+      return cached;
+    }
+
+    // Return offline JSON response
+    return new Response(
+      JSON.stringify({
+        error: 'You are offline. Please check your connection.',
+        offline: true,
+        cached: false
+      }),
+      {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+  }
+}
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
@@ -76,13 +116,13 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
+          if (cacheName !== STATIC_CACHE && cacheName !== API_CACHE) {
+            console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
