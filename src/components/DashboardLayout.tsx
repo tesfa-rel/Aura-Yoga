@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate, useLocation } from 'react-router-dom';
 import Home from './Homepage/Home';
+import LandingPage from './Homepage/LandingPage';
 import ClassList from './Classes/ClassList';
 import PackageList from './Packages/PackageList';
 import BookingHistory from './Booking/BookingHistory';
@@ -88,9 +89,12 @@ const DashboardLayout: React.FC = () => {
   };
 
   const renderContent = () => {
+    if (activeTab === 'home') {
+      return <LandingPage />;
+    }
+
     const content = (() => {
       switch (activeTab) {
-        case 'home': return <Home />;
         case 'classes': return <ClassList />;
         case 'packages': return <PackageList />;
         case 'bookings': return <BookingHistory />;
