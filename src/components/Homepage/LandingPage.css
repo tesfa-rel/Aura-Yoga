@@ -1,0 +1,414 @@
+/* Scoped Landing Page Styles */
+.landing-page {
+  --lp-ink: #241a13;
+  --lp-bark: #3b2a1d;
+  --lp-umber: #5c4530;
+  --lp-clay: #a87f5a;
+  --lp-sand: #cdab85;
+  --lp-cream: #f2ebe0;
+  --lp-paper: #eee5d6;
+  --lp-ivory: #f8f4ec;
+  --lp-line: rgba(242,235,224,0.28);
+  --lp-line-dark: rgba(36,26,19,0.14);
+
+  font-family: 'Jost', sans-serif;
+  color: var(--lp-ink);
+  background: var(--lp-ivory);
+  -webkit-font-smoothing: antialiased;
+}
+
+.landing-page h1,
+.landing-page h2,
+.landing-page h3,
+.landing-page .lp-logo,
+.landing-page .lp-footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+}
+
+.landing-page a { text-decoration: none; color: inherit; }
+.landing-page button {
+  font-family: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.landing-page .lp-eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.landing-page .lp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 0.95rem 2rem;
+  border: 1px solid currentColor;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+.landing-page .lp-btn-light { color: var(--lp-ivory); }
+.landing-page .lp-btn-light:hover { background: var(--lp-ivory); color: var(--lp-bark); }
+.landing-page .lp-btn-dark { color: var(--lp-ink); }
+.landing-page .lp-btn-dark:hover { background: var(--lp-ink); color: var(--lp-ivory); }
+
+/* reveal animation */
+.landing-page .lp-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+.landing-page .lp-reveal.lp-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-page .lp-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .landing-page { scroll-behavior: auto; }
+}
+
+/* ---------- NAV ---------- */
+.landing-page .lp-nav {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.7rem 3.5rem;
+  color: var(--lp-ivory);
+}
+.landing-page .lp-logo {
+  font-size: 1.5rem;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+}
+.landing-page .lp-logo small {
+  display: block;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.32em;
+  font-weight: 300;
+  margin-top: 0.25rem;
+  opacity: 0.85;
+}
+.landing-page .lp-links {
+  display: flex;
+  gap: 2.4rem;
+}
+.landing-page .lp-links a {
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  position: relative;
+  padding-bottom: 4px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+}
+.landing-page .lp-links a::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 0; height: 1px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+.landing-page .lp-links a:hover::after { width: 100%; }
+.landing-page .lp-nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--lp-ivory);
+  font-size: 1.4rem;
+}
+
+/* ---------- HERO ---------- */
+.landing-page .lp-hero {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(125deg, #2c2014 0%, #3a2c1d 45%, #4a3a26 100%);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+}
+.landing-page .lp-hero-content {
+  align-self: center;
+  padding: 0 4rem 0 3.6rem;
+  color: var(--lp-ivory);
+  z-index: 2;
+}
+.landing-page .lp-hero-content .lp-eyebrow {
+  margin-bottom: 1.4rem;
+  opacity: 0.85;
+}
+.landing-page .lp-hero-content h1 {
+  font-size: 5.2rem;
+  letter-spacing: 0.05em;
+  line-height: 1.02;
+  margin-bottom: 1.1rem;
+}
+.landing-page .lp-hero-content .lp-subhead {
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin-bottom: 2.6rem;
+}
+.landing-page .lp-hero-art {
+  position: relative;
+  overflow: hidden;
+}
+.landing-page .lp-hero-art svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- OFFERINGS ---------- */
+.landing-page .lp-offerings {
+  background: var(--lp-cream);
+  padding: 6.5rem 3.5rem 7rem;
+  text-align: center;
+}
+.landing-page .lp-offerings .lp-eyebrow { color: var(--lp-umber); }
+.landing-page .lp-divider {
+  width: 34px;
+  height: 1px;
+  background: var(--lp-clay);
+  margin: 1rem auto 3.8rem;
+}
+.landing-page .lp-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.2rem;
+  max-width: 1180px;
+  margin: 0 auto;
+  text-align: left;
+}
+.landing-page .lp-card-image {
+  aspect-ratio: 1/1.05;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1.6rem;
+}
+.landing-page .lp-card-image svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.landing-page .lp-card h3 {
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  color: var(--lp-bark);
+}
+.landing-page .lp-card p {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: #5a4e40;
+  margin-bottom: 1.3rem;
+  max-width: 30ch;
+}
+.landing-page .lp-card .lp-learn {
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lp-bark);
+  border-bottom: 1px solid var(--lp-clay);
+  padding-bottom: 3px;
+  display: inline-block;
+  transition: opacity 0.3s ease;
+}
+.landing-page .lp-card .lp-learn:hover { opacity: 0.6; }
+
+/* ---------- APPROACH ---------- */
+.landing-page .lp-approach {
+  background: var(--lp-bark);
+  color: var(--lp-ivory);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+}
+.landing-page .lp-approach-text {
+  align-self: center;
+  padding: 5rem 4rem 5rem 3.5rem;
+}
+.landing-page .lp-approach-text .lp-eyebrow {
+  color: var(--lp-sand);
+  margin-bottom: 1.4rem;
+}
+.landing-page .lp-approach-text h2 {
+  font-size: 2.6rem;
+  line-height: 1.18;
+  font-weight: 500;
+  margin-bottom: 1.6rem;
+}
+.landing-page .lp-approach-text p {
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: rgba(242,235,224,0.75);
+  max-width: 38ch;
+  margin-bottom: 2.4rem;
+}
+.landing-page .lp-approach-art {
+  position: relative;
+  min-height: 480px;
+  overflow: hidden;
+}
+.landing-page .lp-approach-art svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- FOOTER ---------- */
+.landing-page .lp-footer {
+  background: var(--lp-ink);
+  color: var(--lp-ivory);
+}
+.landing-page .lp-footer-top {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
+  gap: 2.5rem;
+  padding: 4.2rem 3.5rem 3.4rem;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+.landing-page .lp-footer-logo {
+  font-size: 1.55rem;
+  letter-spacing: 0.18em;
+}
+.landing-page .lp-footer-logo small {
+  display: block;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.32em;
+  font-weight: 300;
+  margin-top: 0.3rem;
+  opacity: 0.8;
+}
+.landing-page .lp-footer-top h4 {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: var(--lp-sand);
+  margin-bottom: 1.1rem;
+}
+.landing-page .lp-footer-top a {
+  display: block;
+  font-size: 0.82rem;
+  line-height: 2.1;
+  color: rgba(242,235,224,0.82);
+  transition: color 0.25s ease;
+}
+.landing-page .lp-footer-top a:hover { color: var(--lp-ivory); }
+.landing-page .lp-footer-top p {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: rgba(242,235,224,0.65);
+  margin-bottom: 1.1rem;
+}
+.landing-page .lp-subscribe {
+  display: flex;
+  border-bottom: 1px solid var(--lp-line);
+  padding-bottom: 0.6rem;
+}
+.landing-page .lp-subscribe input {
+  background: none;
+  border: none;
+  color: var(--lp-ivory);
+  font-family: 'Jost', sans-serif;
+  font-size: 0.82rem;
+  flex: 1;
+  outline: none;
+}
+.landing-page .lp-subscribe input::placeholder { color: rgba(242,235,224,0.45); }
+.landing-page .lp-subscribe button { color: var(--lp-sand); font-size: 1rem; }
+.landing-page .lp-footer-bottom {
+  border-top: 1px solid var(--lp-line);
+  display: flex;
+  justify-content: space-between;
+  padding: 1.4rem 3.5rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  color: rgba(242,235,224,0.5);
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 920px) {
+  .landing-page .lp-nav { padding: 1.4rem 1.6rem; }
+  .landing-page .lp-links { display: none; }
+  .landing-page .lp-links.lp-open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 70px;
+    right: 1.6rem;
+    background: #241a13;
+    padding: 1.2rem 1.6rem;
+    gap: 1rem;
+    border-radius: 2px;
+    z-index: 20;
+  }
+  .landing-page .lp-nav-toggle { display: block; }
+  .landing-page .lp-nav .lp-btn { display: none; }
+
+  .landing-page .lp-hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding-top: 6rem;
+  }
+  .landing-page .lp-hero-content {
+    padding: 2.5rem 1.8rem 3rem;
+    order: 1;
+  }
+  .landing-page .lp-hero-content h1 { font-size: 3.1rem; }
+  .landing-page .lp-hero-art { order: 2; height: 280px; }
+
+  .landing-page .lp-offerings { padding: 4.5rem 1.6rem 4.5rem; }
+  .landing-page .lp-cards { grid-template-columns: 1fr; gap: 2.6rem; }
+
+  .landing-page .lp-approach { grid-template-columns: 1fr; }
+  .landing-page .lp-approach-text { padding: 3.6rem 1.8rem; }
+  .landing-page .lp-approach-text h2 { font-size: 2.1rem; }
+  .landing-page .lp-approach-art { min-height: 320px; order: -1; }
+
+  .landing-page .lp-footer-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.4rem 1.6rem;
+    padding: 3.4rem 1.8rem 2.6rem;
+  }
+  .landing-page .lp-footer-top > div:first-child { grid-column: 1/-1; }
+  .landing-page .lp-footer-bottom {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.3rem 1.8rem 2rem;
+  }
+}
