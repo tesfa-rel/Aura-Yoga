@@ -22,10 +22,10 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
   onLogout,
 }) => {
   return (
-    <aside className="hidden lg:flex flex-col w-64 h-screen sticky top-0 bg-white border-r border-gray-200 z-40">
+    <aside className="hidden lg:flex flex-col w-64 h-screen sticky top-0 bg-aura-ivory border-r border-aura-sand/30 z-40">
       {/* Logo */}
-      <div className="flex items-center h-16 px-6 border-b border-gray-200">
-        <h1 className="text-xl font-bold text-purple-600">AURA Yoga</h1>
+      <div className="flex items-center h-16 px-6 border-b border-aura-sand/30">
+        <h1 className="text-xl font-bold text-aura-bark font-serif">AURA</h1>
       </div>
 
       {/* Navigation */}
@@ -40,8 +40,8 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
                 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
                 transition-colors duration-200 min-h-[44px]
                 ${isActive
-                  ? 'bg-purple-50 text-purple-700'
-                  : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-aura-sand/20 text-aura-bark'
+                  : 'text-aura-umber hover:bg-aura-sand/10 hover:text-aura-ink'
                 }
               `}
               aria-current={isActive ? 'page' : undefined}
@@ -54,18 +54,18 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
       </nav>
 
       {/* User & Logout */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-aura-sand/30">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
-            <span className="text-sm font-semibold text-purple-600">
+          <div className="w-8 h-8 rounded-full bg-aura-sand/20 flex items-center justify-center">
+            <span className="text-sm font-semibold text-aura-bark">
               {userName.charAt(0).toUpperCase()}
             </span>
           </div>
-          <span className="text-sm font-medium text-gray-700 truncate">{userName}</span>
+          <span className="text-sm font-medium text-aura-umber truncate">{userName}</span>
         </div>
         <button
           onClick={onLogout}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors min-h-[44px]"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-aura-bark hover:bg-aura-sand/10 rounded-lg transition-colors min-h-[44px]"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

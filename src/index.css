@@ -4,13 +4,26 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+:root {
+  --aura-ink: #241a13;
+  --aura-bark: #3b2a1d;
+  --aura-umber: #5c4530;
+  --aura-clay: #a87f5a;
+  --aura-sand: #cdab85;
+  --aura-cream: #f2ebe0;
+  --aura-paper: #eee5d6;
+  --aura-ivory: #f8f4ec;
+}
+
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Jost', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--aura-cream);
+  color: var(--aura-ink);
 }
 
 code {
