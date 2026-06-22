@@ -83,40 +83,11 @@ const LandingPage: React.FC = () => {
           </button>
         </div>
         <div className="lp-hero-art">
-          <svg viewBox="0 0 700 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="lp-bg1" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#352718" />
-                <stop offset="100%" stopColor="#4d3b26" />
-              </linearGradient>
-              <linearGradient id="lp-archGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#cdab85" />
-                <stop offset="100%" stopColor="#a4815c" />
-              </linearGradient>
-              <radialGradient id="lp-sphereGrad" cx="35%" cy="30%" r="75%">
-                <stop offset="0%" stopColor="#4a3a28" />
-                <stop offset="100%" stopColor="#1c130a" />
-              </radialGradient>
-              <linearGradient id="lp-floorGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#3a2c1c" />
-                <stop offset="100%" stopColor="#241a10" />
-              </linearGradient>
-            </defs>
-            <rect width="700" height="800" fill="url(#lp-bg1)" />
-            <rect x="0" y="560" width="700" height="240" fill="url(#lp-floorGrad)" />
-            <path
-              d="M180 800 L180 360 Q180 180 380 180 Q580 180 580 360 L580 800 Z"
-              fill="url(#lp-archGrad)"
-              opacity="0.92"
-            />
-            <path
-              d="M250 800 L250 380 Q250 240 380 240 Q510 240 510 380 L510 800 Z"
-              fill="url(#lp-bg1)"
-            />
-            <ellipse cx="468" cy="700" rx="92" ry="92" fill="url(#lp-sphereGrad)" />
-            <ellipse cx="468" cy="788" rx="100" ry="14" fill="#140d06" opacity="0.45" />
-            <rect x="0" y="0" width="700" height="800" fill="#2a1d12" opacity="0.08" />
-          </svg>
+          <img
+            src="/images/hero-right-image.PNG"
+            alt="Aura Studio hero"
+            className="lp-hero-img"
+          />
         </div>
       </section>
 
