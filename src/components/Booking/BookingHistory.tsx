@@ -94,12 +94,12 @@ const BookingHistory: React.FC = () => {
 
   const getClassTypeColor = (classType: string) => {
     switch (classType) {
-      case 'YOGA':
-        return 'bg-purple-100 text-purple-800';
       case 'PILATES':
         return 'bg-pink-100 text-pink-800';
-      case 'MEDITATION':
-        return 'bg-blue-100 text-blue-800';
+      case 'PRENATAL':
+        return 'bg-amber-100 text-amber-800';
+      case 'POSTPARTUM':
+        return 'bg-rose-100 text-rose-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }

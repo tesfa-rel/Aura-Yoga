@@ -30,8 +30,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   PRENATAL: 'Prenatal',
   POSTPARTUM: 'Postpartum',
   ALL: 'General',
-  YOGA: 'Yoga',
-  MEDITATION: 'Meditation',
 };
 
 const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) => {
@@ -172,7 +170,7 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
         <p className="text-aura-sand">
           {showUserPackages
             ? 'Manage your purchased packages and track remaining sessions'
-            : 'Choose the perfect package for your yoga journey'
+            : 'Choose the perfect package for your pilates journey'
           }
         </p>
       </div>
@@ -204,7 +202,7 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
       {/* Category Filter */}
       {!showUserPackages && (
         <div className="flex flex-wrap gap-2 justify-center">
-          {['ALL', 'PILATES', 'PRENATAL', 'POSTPARTUM', 'YOGA', 'MEDITATION'].map((cat) => (
+          {['ALL', 'PILATES', 'PRENATAL', 'POSTPARTUM'].map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}

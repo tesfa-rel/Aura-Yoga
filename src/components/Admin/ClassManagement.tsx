@@ -47,11 +47,11 @@ const ClassManagement: React.FC = () => {
     time: '',
     duration: 60,
     capacity: 20,
-    classType: 'YOGA',
+    classType: 'PILATES',
     price: 0,
   });
 
-  const classTypes = ['YOGA', 'PILATES', 'MEDITATION'];
+  const classTypes = ['PILATES', 'PRENATAL', 'POSTPARTUM'];
   const instructors = ['Sarah Johnson', 'Emily Davis', 'Maria Garcia', 'Lisa Chen'];
 
   useEffect(() => {
@@ -201,7 +201,7 @@ const ClassManagement: React.FC = () => {
       time: '',
       duration: 60,
       capacity: 20,
-      classType: 'YOGA',
+      classType: 'PILATES',
       price: 0,
     });
   };
@@ -227,7 +227,7 @@ const ClassManagement: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Class Management</h1>
-          <p className="text-gray-600">Create and manage yoga classes</p>
+          <p className="text-gray-600">Create and manage pilates classes</p>
         </div>
         <button
           onClick={() => setShowForm(true)}

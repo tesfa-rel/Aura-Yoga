@@ -24,9 +24,7 @@ interface ClassCardProps {
 
 const ClassCard: React.FC<ClassCardProps> = ({ classItem, onBook, onJoinWaitlist, onWaitlist = false }) => {
   const classTypeColors = {
-    YOGA: 'bg-aura-sand/15 text-aura-cream',
     PILATES: 'bg-aura-clay/20 text-aura-cream',
-    MEDITATION: 'bg-aura-umber/30 text-aura-cream',
     PRENATAL: 'bg-aura-sand/10 text-aura-cream',
     POSTPARTUM: 'bg-aura-clay/15 text-aura-cream',
   };

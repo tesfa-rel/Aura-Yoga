@@ -45,7 +45,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
   ];
 
   const bankDetails = {
-    accountName: 'AURA Yoga Studio',
+    accountName: 'AURA Pilates Studio',
     bankName: 'Commercial Bank of Ethiopia',
     accountNumber: '1000123456',
     branch: 'Bole Branch',

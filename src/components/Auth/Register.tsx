@@ -61,7 +61,7 @@ const Register: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-aura-cream">
-            Join AURA Yoga
+            Join AURA
           </h2>
           <p className="mt-2 text-center text-sm text-aura-sand">
             Create your account for our women-only studio

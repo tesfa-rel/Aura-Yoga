@@ -127,7 +127,7 @@ const UserDashboard: React.FC = () => {
           Welcome back, {user?.name}!
         </h1>
         <p className="text-gray-600 mb-6">
-          Here's your personal yoga dashboard. View your upcoming classes, manage bookings, and track your progress.
+          Here's your personal pilates dashboard. View your upcoming classes, manage bookings, and track your progress.
         </p>
       </div>
       

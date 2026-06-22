@@ -81,7 +81,7 @@ const PWAInstallBanner: React.FC = () => {
               </svg>
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">Install AURA Yoga</p>
+              <p className="text-sm font-semibold text-gray-900 truncate">Install AURA</p>
               <p className="text-xs text-gray-500 truncate">Better experience on your home screen</p>
             </div>
           </div>
@@ -112,7 +112,7 @@ const PWAInstallBanner: React.FC = () => {
               </svg>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900">Install AURA Yoga</p>
+              <p className="text-sm font-semibold text-gray-900">Install AURA</p>
               <p className="text-xs text-gray-500 mt-0.5">Get a better experience with the app on your device.</p>
               <div className="flex items-center gap-2 mt-2">
                 <button

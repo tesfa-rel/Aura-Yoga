@@ -47,10 +47,10 @@ const Login: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-aura-cream">
-            Sign in to AURA Yoga
+            Sign in to AURA
           </h2>
           <p className="mt-2 text-center text-sm text-aura-sand">
-            Women-only Yoga & Pilates Studio
+            Women-only Pilates Studio
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

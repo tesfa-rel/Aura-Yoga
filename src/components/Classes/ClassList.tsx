@@ -257,6 +257,7 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
               value={filters.date}
               onChange={(e) => handleFilterChange('date', e.target.value)}
               className="w-full px-3 py-2 border border-aura-sand/30 rounded-md focus:outline-none focus:ring-aura-sand focus:border-aura-sand bg-aura-bark text-aura-cream placeholder:text-aura-sand/70"
+              style={{ colorScheme: 'dark' }}
             />
           </div>
 
@@ -271,11 +272,9 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
               className="w-full px-3 py-2 border border-aura-sand/30 rounded-md focus:outline-none focus:ring-aura-sand focus:border-aura-sand bg-aura-bark text-aura-cream placeholder:text-aura-sand/70"
             >
               <option value="">All Types</option>
-              <option value="YOGA">Yoga</option>
               <option value="PILATES">Pilates</option>
               <option value="PRENATAL">Prenatal</option>
               <option value="POSTPARTUM">Postpartum</option>
-              <option value="MEDITATION">Meditation</option>
             </select>
           </div>
 

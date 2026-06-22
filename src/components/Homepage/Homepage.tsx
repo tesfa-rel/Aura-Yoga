@@ -23,9 +23,9 @@ interface ClassItem {
 }
 
 const classTypeLabels: Record<string, string> = {
-  YOGA: 'Yoga',
   PILATES: 'Pilates',
-  MEDITATION: 'Meditation',
+  PRENATAL: 'Prenatal',
+  POSTPARTUM: 'Postpartum',
 };
 
 const Homepage: React.FC = () => {
@@ -137,7 +137,7 @@ const Homepage: React.FC = () => {
       <section className="hero" id="hero">
         <div className="hero-content">
           <h1>Move. Breathe. Transform.</h1>
-          <p>Book your perfect yoga and pilates class with ease. Join our women-only community.</p>
+          <p>Book your perfect pilates class with ease. Join our women-only community.</p>
           <div className="hero-buttons">
             <a href="#classes" className="hero-button primary" onClick={scrollToClasses}>
               Book a Class
@@ -161,9 +161,9 @@ const Homepage: React.FC = () => {
           <h2>What We Offer</h2>
           <div className="offer-grid">
             <div className="offer-card fade-in">
-              <div className="offer-card-icon">🧘‍♀️</div>
-              <h3>Yoga Classes</h3>
-              <p>From gentle Hatha to dynamic Vinyasa flows. All levels welcome. Find your rhythm and build strength with intention.</p>
+              <div className="offer-card-icon">�</div>
+              <h3>Prenatal Pilates</h3>
+              <p>Safe, gentle movement for every stage of pregnancy. Strengthen your core, improve posture, and prepare for birth with confidence.</p>
             </div>
             <div className="offer-card fade-in">
               <div className="offer-card-icon">💪</div>
@@ -324,7 +324,7 @@ const Homepage: React.FC = () => {
             <div className="testimonial-card fade-in">
               <p className="testimonial-quote">The women-only environment makes all the difference. I can be myself and focus on my practice without distraction.</p>
               <p className="testimonial-author">Jessica L.</p>
-              <p className="testimonial-role">Yoga Practitioner</p>
+              <p className="testimonial-role">Pilates Practitioner</p>
             </div>
             <div className="testimonial-card fade-in">
               <p className="testimonial-quote">Booking classes is so easy, and the instructors are incredibly knowledgeable. This is my happy place.</p>
@@ -419,7 +419,7 @@ const Homepage: React.FC = () => {
         <div className="footer-content">
           <div className="footer-section">
             <h3>AURA</h3>
-            <p>Women-only yoga and pilates studio. Move. Breathe. Transform.</p>
+            <p>Women-only pilates studio. Move. Breathe. Transform.</p>
             <div className="social-icons">
               <button className="social-icon" aria-label="Facebook">f</button>
               <button className="social-icon" aria-label="Twitter">𝕏</button>
@@ -455,7 +455,7 @@ const Homepage: React.FC = () => {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; {new Date().getFullYear()} AURA Yoga & Pilates Studio. All rights reserved. Women-only wellness space.</p>
+          <p>&copy; {new Date().getFullYear()} AURA Pilates Studio. All rights reserved. Women-only wellness space.</p>
         </div>
       </footer>
     </>

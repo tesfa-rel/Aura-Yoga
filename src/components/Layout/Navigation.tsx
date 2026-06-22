@@ -33,7 +33,7 @@ const Navigation: React.FC = () => {
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl sm:text-2xl font-bold text-purple-600">AURA Yoga</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-purple-600">AURA</h1>
             </div>
           </div>
 
