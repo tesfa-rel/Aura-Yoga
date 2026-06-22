@@ -138,7 +138,7 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aura-umber"></div>
       </div>
     );
   }
@@ -147,17 +147,17 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
     <div className="space-y-6">
       {/* Messages */}
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        <div className="bg-green-50 border border-green-300 text-green-700 px-4 py-3 rounded">
           {successMessage}
         </div>
       )}
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded">
           {error}
           <button
             onClick={() => setError('')}
-            className="ml-4 text-green-700 hover:text-green-600"
+            className="ml-4 text-red-700 hover:text-red-600"
           >
             ×
           </button>
@@ -166,11 +166,11 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
 
       {/* Header */}
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-aura-bark mb-2">
           {showUserPackages ? 'My Packages' : 'Available Packages'}
         </h2>
-        <p className="text-gray-600">
-          {showUserPackages 
+        <p className="text-aura-umber">
+          {showUserPackages
             ? 'Manage your purchased packages and track remaining sessions'
             : 'Choose the perfect package for your yoga journey'
           }
@@ -179,19 +179,19 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
 
       {/* User Packages Summary (when not showing only user packages) */}
       {!showUserPackages && userPackages.length > 0 && (
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-purple-900 mb-4">Your Active Packages</h3>
+        <div className="bg-aura-cream border border-aura-sand/30 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-aura-bark mb-4">Your Active Packages</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {userPackages
               .filter(up => up.remainingSessions > 0 && (!up.expiresAt || new Date(up.expiresAt) >= new Date()))
               .map(userPackage => (
-                <div key={userPackage.id} className="bg-white rounded-lg p-4 shadow-sm">
-                  <h4 className="font-medium text-gray-900">{userPackage.package.name}</h4>
-                  <p className="text-sm text-gray-600 mt-1">
+                <div key={userPackage.id} className="bg-aura-ivory rounded-lg p-4 shadow-sm border border-aura-sand/20">
+                  <h4 className="font-medium text-aura-bark">{userPackage.package.name}</h4>
+                  <p className="text-sm text-aura-umber mt-1">
                     {userPackage.remainingSessions} sessions remaining
                   </p>
                   {userPackage.expiresAt && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-aura-clay mt-1">
                       Expires {new Date(userPackage.expiresAt).toLocaleDateString()}
                     </p>
                   )}
@@ -223,7 +223,7 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
       {/* Packages Grid */}
       {filteredPackages.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">
+          <p className="text-aura-clay">
             {showUserPackages ? 'No packages found.' : 'No packages available at the moment.'}
           </p>
         </div>

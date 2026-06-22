@@ -216,7 +216,7 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aura-umber"></div>
       </div>
     );
   }
@@ -244,11 +244,11 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
       )}
 
       {/* Filters */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-lg font-semibold mb-4">Filter Classes</h2>
+      <div className="bg-aura-ivory p-6 rounded-lg shadow border border-aura-sand/20">
+        <h2 className="text-lg font-semibold text-aura-bark mb-4">Filter Classes</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="date" className="block text-sm font-medium text-aura-bark mb-1">
               Date
             </label>
             <input
@@ -256,19 +256,19 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
               id="date"
               value={filters.date}
               onChange={(e) => handleFilterChange('date', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+              className="w-full px-3 py-2 border border-aura-sand/30 rounded-md focus:outline-none focus:ring-aura-umber focus:border-aura-umber bg-aura-cream"
             />
           </div>
-          
+
           <div>
-            <label htmlFor="classType" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="classType" className="block text-sm font-medium text-aura-bark mb-1">
               Class Type
             </label>
             <select
               id="classType"
               value={filters.classType}
               onChange={(e) => handleFilterChange('classType', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+              className="w-full px-3 py-2 border border-aura-sand/30 rounded-md focus:outline-none focus:ring-aura-umber focus:border-aura-umber bg-aura-cream"
             >
               <option value="">All Types</option>
               <option value="YOGA">Yoga</option>
@@ -278,9 +278,9 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
               <option value="MEDITATION">Meditation</option>
             </select>
           </div>
-          
+
           <div>
-            <label htmlFor="instructor" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="instructor" className="block text-sm font-medium text-aura-bark mb-1">
               Instructor
             </label>
             <input
@@ -289,14 +289,14 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
               value={filters.instructor}
               onChange={(e) => handleFilterChange('instructor', e.target.value)}
               placeholder="Search by instructor"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+              className="w-full px-3 py-2 border border-aura-sand/30 rounded-md focus:outline-none focus:ring-aura-umber focus:border-aura-umber bg-aura-cream"
             />
           </div>
         </div>
-        
+
         <button
           onClick={() => setFilters({ date: '', classType: '', instructor: '' })}
-          className="mt-4 text-sm text-purple-600 hover:text-purple-500"
+          className="mt-4 text-sm text-aura-umber hover:text-aura-bark"
         >
           Clear all filters
         </button>
@@ -305,7 +305,7 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
       {/* Classes Grid */}
       {classes.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">No classes found matching your criteria.</p>
+          <p className="text-aura-clay">No classes found matching your criteria.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

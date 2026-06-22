@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'r
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navigation from './components/Layout/Navigation';
+import PublicHeader from './components/Layout/PublicHeader';
 import Homepage from './components/Homepage/LandingPage';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
@@ -24,52 +25,17 @@ import NotificationSettings from './components/Notifications/NotificationSetting
 import { register } from './utils/serviceWorkerRegistration';
 import './App.css';
 
-function PublicLayout({ children }: { children: React.ReactNode }) {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-
+function PublicLayout({ children, fullWidth = false }: { children: React.ReactNode; fullWidth?: boolean }) {
   return (
-    <div className="min-h-screen bg-aura-cream">
-      <header className="bg-aura-ivory border-b border-aura-sand/30 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14">
-            <button
-              onClick={() => navigate('/')}
-              className="text-lg font-bold text-aura-bark font-serif"
-            >
-              AURA
-            </button>
-            <div className="flex items-center gap-3">
-              {user ? (
-                <button
-                  onClick={() => navigate('/dashboard')}
-                  className="px-4 py-2 text-sm font-medium text-aura-bark hover:bg-aura-sand/20 rounded-lg transition-colors"
-                >
-                  Dashboard
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={() => navigate('/login')}
-                    className="px-4 py-2 text-sm font-medium text-aura-bark hover:bg-aura-sand/20 rounded-lg transition-colors"
-                  >
-                    Log in
-                  </button>
-                  <button
-                    onClick={() => navigate('/register')}
-                    className="px-4 py-2 text-sm font-medium bg-aura-bark text-aura-ivory rounded-lg hover:bg-aura-umber transition-colors"
-                  >
-                    Sign up
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {children}
-      </main>
+    <div className="min-h-screen bg-aura-paper">
+      <PublicHeader />
+      {fullWidth ? (
+        children
+      ) : (
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {children}
+        </main>
+      )}
     </div>
   );
 }
@@ -77,12 +43,12 @@ function PublicLayout({ children }: { children: React.ReactNode }) {
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Homepage />} />
+      <Route path="/" element={<PublicLayout fullWidth><Homepage /></PublicLayout>} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/home" element={<Homepage />} />
+      <Route path="/home" element={<PublicLayout fullWidth><Homepage /></PublicLayout>} />
 
       {/* Public class & package browsing (no login required) */}
       <Route
@@ -229,7 +195,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-aura-cream">
+        <div className="min-h-screen bg-aura-paper">
           <NetworkStatusBar />
           <OfflineIndicator />
           <PWAInstallBanner />

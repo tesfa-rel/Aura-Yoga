@@ -1,13 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './LandingPage.css';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [burgerDark, setBurgerDark] = useState(false);
-  const navRef = useRef<HTMLElement>(null);
+  const location = useLocation();
 
+  // Scroll reveal animation
   useEffect(() => {
     const items = document.querySelectorAll('.lp-reveal');
     const io = new IntersectionObserver(
@@ -25,24 +24,16 @@ const LandingPage: React.FC = () => {
     return () => io.disconnect();
   }, []);
 
-  // Burger color based on scroll (dark on light sections)
+  // Handle hash-based scrolling when navigating from other pages
   useEffect(() => {
-    const updateBurgerColor = () => {
-      const y = window.scrollY;
-      const hero = document.getElementById('top')?.offsetHeight || 0;
-      const offerings = document.getElementById('pilates')?.offsetHeight || 0;
-      const approach = document.getElementById('approach')?.offsetHeight || 0;
-      const h1 = hero;
-      const h2 = h1 + offerings;
-      const h3 = h2 + approach;
-      // Dark on offerings (cream bg) and footer, light elsewhere
-      const isDark = (y >= h1 && y < h2) || (y >= h3);
-      setBurgerDark(isDark);
-    };
-    window.addEventListener('scroll', updateBurgerColor);
-    updateBurgerColor();
-    return () => window.removeEventListener('scroll', updateBurgerColor);
-  }, []);
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      const el = document.getElementById(id);
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100);
+      }
+    }
+  }, [location]);
 
   const handleBook = (classType?: string) => {
     if (classType) {
@@ -57,73 +48,14 @@ const LandingPage: React.FC = () => {
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
-    setMenuOpen(false);
   };
 
   const logoClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setMenuOpen(false);
   };
-
-  const toggleMenu = () => setMenuOpen((o) => !o);
-  const closeMenu = () => setMenuOpen(false);
 
   return (
     <div className="landing-page">
-      {/* ---------- DRAWER + OVERLAY ---------- */}
-      <div
-        className={`lp-overlay ${menuOpen ? 'lp-open' : ''}`}
-        onClick={closeMenu}
-      />
-      <div className={`lp-drawer ${menuOpen ? 'lp-open' : ''}`}>
-        <button className="lp-drawer-close" onClick={closeMenu} aria-label="Close menu">
-          <span></span>
-          <span></span>
-        </button>
-        <button onClick={() => scrollTo('top')}>Home</button>
-        <button onClick={() => scrollTo('pilates')}>Pilates</button>
-        <button onClick={() => scrollTo('prenatal')}>Prenatal</button>
-        <button onClick={() => scrollTo('postpartum')}>Postpartum</button>
-        <button onClick={() => scrollTo('approach')}>About</button>
-        <button onClick={() => scrollTo('footer')}>Contact</button>
-        <a
-          href="https://instagram.com/aurapilates"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="lp-drawer-insta"
-          onClick={closeMenu}
-        >
-          @aurapilates
-        </a>
-      </div>
-
-      {/* ---------- NAV ---------- */}
-      <header className="lp-nav" ref={navRef}>
-        <button className="lp-logo" onClick={logoClick}>
-          AURA
-        </button>
-        <nav className="lp-links">
-          <button onClick={() => scrollTo('top')}>Home</button>
-          <button onClick={() => scrollTo('pilates')}>Pilates</button>
-          <button onClick={() => scrollTo('prenatal')}>Prenatal</button>
-          <button onClick={() => scrollTo('postpartum')}>Postpartum</button>
-          <button onClick={() => scrollTo('approach')}>About</button>
-          <button onClick={() => scrollTo('footer')}>Contact</button>
-        </nav>
-        <button className="lp-btn lp-btn-light" onClick={() => handleBook()}>
-          Book a Class
-        </button>
-        <button
-          className={`lp-burger ${menuOpen ? 'lp-open' : ''} ${burgerDark ? 'lp-dark' : ''}`}
-          aria-label="Menu"
-          onClick={toggleMenu}
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-      </header>
-
       {/* ---------- HERO ---------- */}
       <section className="lp-hero" id="top">
         <div className="lp-hero-content lp-reveal">

@@ -1,0 +1,128 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import './PublicHeader.css';
+
+const PublicHeader: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const isLandingPage = location.pathname === '/' || location.pathname === '/home';
+
+  const toggleMenu = () => setMenuOpen((o) => !o);
+  const closeMenu = () => setMenuOpen(false);
+
+  const handleBook = () => {
+    closeMenu();
+    navigate('/classes');
+  };
+
+  const handleLogoClick = () => {
+    closeMenu();
+    if (isLandingPage) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      navigate('/');
+    }
+  };
+
+  const handleNav = (target: string) => {
+    closeMenu();
+    if (isLandingPage) {
+      const el = document.getElementById(target);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      switch (target) {
+        case 'top':
+          navigate('/');
+          break;
+        case 'pilates':
+          navigate('/classes?classType=PILATES');
+          break;
+        case 'prenatal':
+          navigate('/classes?classType=PRENATAL');
+          break;
+        case 'postpartum':
+          navigate('/classes?classType=POSTPARTUM');
+          break;
+        case 'approach':
+          navigate('/');
+          break;
+        case 'footer':
+          navigate('/');
+          break;
+        default:
+          navigate('/');
+      }
+    }
+  };
+
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
+  return (
+    <div className="public-header">
+      {/* Overlay + Drawer */}
+      <div className={`ph-overlay ${menuOpen ? 'ph-open' : ''}`} onClick={closeMenu} />
+      <div className={`ph-drawer ${menuOpen ? 'ph-open' : ''}`}>
+        <button className="ph-drawer-close" onClick={closeMenu} aria-label="Close menu">
+          <span></span>
+          <span></span>
+        </button>
+        <button onClick={() => handleNav('top')}>Home</button>
+        <button onClick={() => handleNav('pilates')}>Pilates</button>
+        <button onClick={() => handleNav('prenatal')}>Prenatal</button>
+        <button onClick={() => handleNav('postpartum')}>Postpartum</button>
+        <button onClick={() => handleNav('approach')}>About</button>
+        <button onClick={() => handleNav('footer')}>Contact</button>
+        <a
+          href="https://instagram.com/aurapilates"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ph-drawer-insta"
+          onClick={closeMenu}
+        >
+          @aurapilates
+        </a>
+      </div>
+
+      {/* Nav Bar */}
+      <header className={`ph-nav ${isLandingPage ? 'ph-landing' : ''}`}>
+        <button className="ph-logo" onClick={handleLogoClick}>
+          AURA
+        </button>
+        <nav className="ph-links">
+          <button onClick={() => handleNav('top')}>Home</button>
+          <button onClick={() => handleNav('pilates')}>Pilates</button>
+          <button onClick={() => handleNav('prenatal')}>Prenatal</button>
+          <button onClick={() => handleNav('postpartum')}>Postpartum</button>
+          <button onClick={() => handleNav('approach')}>About</button>
+          <button onClick={() => handleNav('footer')}>Contact</button>
+        </nav>
+        <button className="ph-btn ph-btn-light" onClick={handleBook}>
+          Book a Class
+        </button>
+        <button
+          className={`ph-burger ${menuOpen ? 'ph-open' : ''}`}
+          aria-label="Menu"
+          onClick={toggleMenu}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </header>
+    </div>
+  );
+};
+
+export default PublicHeader;
