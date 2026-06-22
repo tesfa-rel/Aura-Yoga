@@ -181,7 +181,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: 85% center;
 }
 
 /* ---------- OFFERINGS ---------- */
@@ -395,6 +395,7 @@
   }
   .landing-page .lp-hero-content h1 { font-size: 3.1rem; }
   .landing-page .lp-hero-art { order: 2; height: 280px; }
+  .landing-page .lp-hero-art .lp-hero-img { object-position: center; }
 
   .landing-page .lp-offerings { padding: 4.5rem 1.6rem 4.5rem; }
   .landing-page .lp-cards { grid-template-columns: 1fr; gap: 2.6rem; }
