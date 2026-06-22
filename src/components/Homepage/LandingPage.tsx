@@ -183,33 +183,11 @@ const LandingPage: React.FC = () => {
           </button>
         </div>
         <div className="lp-approach-art">
-          <svg viewBox="0 0 700 700" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="lp-wall" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#4a3a26" />
-                <stop offset="100%" stopColor="#241a10" />
-              </linearGradient>
-              <linearGradient id="lp-canvas" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#8a6a45" />
-                <stop offset="100%" stopColor="#5c4530" />
-              </linearGradient>
-            </defs>
-            <rect width="700" height="700" fill="url(#lp-wall)" />
-            <rect x="150" y="120" width="300" height="380" fill="url(#lp-canvas)" />
-            <path
-              d="M180 480 Q260 250 420 160"
-              stroke="#cdab85"
-              strokeWidth="10"
-              fill="none"
-              opacity="0.55"
-              strokeLinecap="round"
-            />
-            <ellipse cx="330" cy="600" rx="60" ry="34" fill="#1a1106" />
-            <rect x="300" y="540" width="60" height="70" fill="#1a1106" />
-            <line x1="330" y1="540" x2="305" y2="430" stroke="#3a2c1d" strokeWidth="3" />
-            <line x1="330" y1="540" x2="350" y2="420" stroke="#3a2c1d" strokeWidth="3" />
-            <line x1="330" y1="540" x2="325" y2="450" stroke="#3a2c1d" strokeWidth="2" />
-          </svg>
+          <img
+            src="/images/about-right-image.PNG"
+            alt="Aura Studio approach"
+            className="lp-approach-img"
+          />
         </div>
       </section>
 
