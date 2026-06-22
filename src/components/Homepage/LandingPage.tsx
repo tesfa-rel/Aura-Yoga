@@ -5,6 +5,7 @@ import './LandingPage.css';
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [burgerDark, setBurgerDark] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -22,6 +23,25 @@ const LandingPage: React.FC = () => {
     );
     items.forEach((el) => io.observe(el));
     return () => io.disconnect();
+  }, []);
+
+  // Burger color based on scroll (dark on light sections)
+  useEffect(() => {
+    const updateBurgerColor = () => {
+      const y = window.scrollY;
+      const hero = document.getElementById('top')?.offsetHeight || 0;
+      const offerings = document.getElementById('pilates')?.offsetHeight || 0;
+      const approach = document.getElementById('approach')?.offsetHeight || 0;
+      const h1 = hero;
+      const h2 = h1 + offerings;
+      const h3 = h2 + approach;
+      // Dark on offerings (cream bg) and footer, light elsewhere
+      const isDark = (y >= h1 && y < h2) || (y >= h3);
+      setBurgerDark(isDark);
+    };
+    window.addEventListener('scroll', updateBurgerColor);
+    updateBurgerColor();
+    return () => window.removeEventListener('scroll', updateBurgerColor);
   }, []);
 
   const handleBook = (classType?: string) => {
@@ -45,14 +65,44 @@ const LandingPage: React.FC = () => {
     setMenuOpen(false);
   };
 
+  const toggleMenu = () => setMenuOpen((o) => !o);
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <div className="landing-page">
+      {/* ---------- DRAWER + OVERLAY ---------- */}
+      <div
+        className={`lp-overlay ${menuOpen ? 'lp-open' : ''}`}
+        onClick={closeMenu}
+      />
+      <div className={`lp-drawer ${menuOpen ? 'lp-open' : ''}`}>
+        <button className="lp-drawer-close" onClick={closeMenu} aria-label="Close menu">
+          <span></span>
+          <span></span>
+        </button>
+        <button onClick={() => scrollTo('top')}>Home</button>
+        <button onClick={() => scrollTo('pilates')}>Pilates</button>
+        <button onClick={() => scrollTo('prenatal')}>Prenatal</button>
+        <button onClick={() => scrollTo('postpartum')}>Postpartum</button>
+        <button onClick={() => scrollTo('approach')}>About</button>
+        <button onClick={() => scrollTo('footer')}>Contact</button>
+        <a
+          href="https://instagram.com/aurapilates"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="lp-drawer-insta"
+          onClick={closeMenu}
+        >
+          @aurapilates
+        </a>
+      </div>
+
       {/* ---------- NAV ---------- */}
       <header className="lp-nav" ref={navRef}>
         <button className="lp-logo" onClick={logoClick}>
-          AURA<small>STUDIO</small>
+          AURA
         </button>
-        <nav className={`lp-links ${menuOpen ? 'lp-open' : ''}`}>
+        <nav className="lp-links">
           <button onClick={() => scrollTo('top')}>Home</button>
           <button onClick={() => scrollTo('pilates')}>Pilates</button>
           <button onClick={() => scrollTo('prenatal')}>Prenatal</button>
@@ -64,11 +114,13 @@ const LandingPage: React.FC = () => {
           Book a Class
         </button>
         <button
-          className="lp-nav-toggle"
+          className={`lp-burger ${menuOpen ? 'lp-open' : ''} ${burgerDark ? 'lp-dark' : ''}`}
           aria-label="Menu"
-          onClick={() => setMenuOpen((o) => !o)}
+          onClick={toggleMenu}
         >
-          &#9776;
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
       </header>
 
@@ -204,7 +256,6 @@ const LandingPage: React.FC = () => {
             <button onClick={() => scrollTo('approach')}>About</button>
             <button onClick={() => scrollTo('approach')}>Our Approach</button>
             <button onClick={() => handleBook()}>Reviews</button>
-            <button onClick={() => scrollTo('footer')}>Contact</button>
           </div>
           <div>
             <h4>Follow</h4>

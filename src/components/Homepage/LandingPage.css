@@ -112,7 +112,7 @@
   gap: 2.4rem;
 }
 .landing-page .lp-links a {
-  font-size: 0.68rem;
+  font-size: 0.82rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   position: relative;
@@ -131,6 +131,139 @@
   transition: width 0.3s ease;
 }
 .landing-page .lp-links a:hover::after { width: 100%; }
+/* BURGER */
+.landing-page .lp-burger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 300;
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  width: 40px;
+  height: 40px;
+}
+.landing-page .lp-burger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: #FFFFFF;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+  border-radius: 2px;
+}
+.landing-page .lp-burger.lp-dark span {
+  background: var(--lp-bark);
+}
+.landing-page .lp-burger.lp-open span:nth-child(1) {
+  transform: translateY(7.5px) rotate(45deg);
+}
+.landing-page .lp-burger.lp-open span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.landing-page .lp-burger.lp-open span:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
+
+/* OVERLAY + DRAWER */
+.landing-page .lp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(68, 41, 19, 0.45);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.landing-page .lp-overlay.lp-open {
+  opacity: 1;
+  pointer-events: all;
+}
+.landing-page .lp-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(260px, 78vw);
+  height: 100vh;
+  background: var(--lp-bark);
+  z-index: 250;
+  display: flex;
+  flex-direction: column;
+  padding: 72px 36px 48px;
+  transform: translateX(110%);
+  transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.landing-page .lp-drawer.lp-open {
+  transform: translateX(0);
+}
+.landing-page .lp-drawer button {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 26px;
+  font-weight: 300;
+  color: var(--lp-sand);
+  background: none;
+  border: none;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  padding: 14px 0;
+  border-bottom: 0.5px solid rgba(212, 187, 172, 0.12);
+  transition: color 0.2s;
+  display: block;
+  text-align: left;
+  cursor: pointer;
+}
+.landing-page .lp-drawer button:last-of-type {
+  border-bottom: none;
+}
+.landing-page .lp-drawer button:hover {
+  color: #FFFFFF;
+}
+.landing-page .lp-drawer-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.landing-page .lp-drawer-close span {
+  position: absolute;
+  width: 18px;
+  height: 1.5px;
+  background: var(--lp-sand);
+  border-radius: 2px;
+}
+.landing-page .lp-drawer-close span:nth-child(1) {
+  transform: rotate(45deg);
+}
+.landing-page .lp-drawer-close span:nth-child(2) {
+  transform: rotate(-45deg);
+}
+.landing-page .lp-drawer-insta {
+  margin-top: auto;
+  padding-top: 28px;
+  font-family: 'Jost', sans-serif !important;
+  font-style: normal !important;
+  font-size: 10px !important;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--lp-clay) !important;
+  border-bottom: none !important;
+  text-decoration: none;
+}
+
 .landing-page .lp-nav-toggle {
   display: none;
   background: none;
@@ -323,14 +456,21 @@
   color: var(--lp-sand);
   margin-bottom: 1.1rem;
 }
-.landing-page .lp-footer-top a {
+.landing-page .lp-footer-top a,
+.landing-page .lp-footer-top button {
   display: block;
   font-size: 0.82rem;
   line-height: 2.1;
   color: rgba(242,235,224,0.82);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
   transition: color 0.25s ease;
 }
-.landing-page .lp-footer-top a:hover { color: var(--lp-ivory); }
+.landing-page .lp-footer-top a:hover,
+.landing-page .lp-footer-top button:hover { color: var(--lp-ivory); }
 .landing-page .lp-footer-top p {
   font-size: 0.82rem;
   line-height: 1.6;
@@ -369,19 +509,7 @@
 @media (max-width: 920px) {
   .landing-page .lp-nav { padding: 1.4rem 1.6rem; }
   .landing-page .lp-links { display: none; }
-  .landing-page .lp-links.lp-open {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    top: 70px;
-    right: 1.6rem;
-    background: #241a13;
-    padding: 1.2rem 1.6rem;
-    gap: 1rem;
-    border-radius: 2px;
-    z-index: 20;
-  }
-  .landing-page .lp-nav-toggle { display: block; }
+  .landing-page .lp-burger { display: flex; }
   .landing-page .lp-nav .lp-btn { display: none; }
 
   .landing-page .lp-hero {
