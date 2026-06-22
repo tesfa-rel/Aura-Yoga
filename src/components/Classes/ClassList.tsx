@@ -38,7 +38,7 @@ const ClassList: React.FC<ClassListProps> = ({ onBookClass }) => {
     date: '',
     classType: urlClassType,
     instructor: '',
-    packageType: '',
+    packageType: urlClassType ? `${urlClassType}|dropin` : '',
   });
   const [activePackages, setActivePackages] = useState<{ id: string; name: string; remainingSessions: number }[]>([]);
   const [waitlistedClassIds, setWaitlistedClassIds] = useState<string[]>([]);

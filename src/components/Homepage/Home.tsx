@@ -211,7 +211,7 @@ const Home: React.FC = () => {
                     </div>
                     <button
                       className="class-book-btn"
-                      onClick={(e) => { e.stopPropagation(); navigate('/classes'); }}
+                      onClick={(e) => { e.stopPropagation(); navigate(`/classes?classType=${cls.classType}`); }}
                     >
                       Book Now
                     </button>

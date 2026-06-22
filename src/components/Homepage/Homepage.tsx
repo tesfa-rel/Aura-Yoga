@@ -222,7 +222,7 @@ const Homepage: React.FC = () => {
           ) : (
             <div className="class-grid">
               {classes.slice(0, 4).map(cls => (
-                <div className="class-card fade-in" key={cls.id} onClick={() => navigate('/classes')}>
+                <div className="class-card fade-in" key={cls.id} onClick={() => navigate(`/classes?classType=${cls.classType}`)}>
                   <div className="class-card-image-wrapper">
                     <img
                       src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&h=300&fit=crop"
@@ -248,7 +248,7 @@ const Homepage: React.FC = () => {
                     </div>
                     <button
                       className="class-book-btn"
-                      onClick={() => navigate('/classes')}
+                      onClick={(e) => { e.stopPropagation(); navigate(`/classes?classType=${cls.classType}`); }}
                     >
                       Book Now
                     </button>
