@@ -24,11 +24,11 @@ interface ClassCardProps {
 
 const ClassCard: React.FC<ClassCardProps> = ({ classItem, onBook, onJoinWaitlist, onWaitlist = false }) => {
   const classTypeColors = {
-    YOGA: 'bg-aura-cream text-aura-bark',
-    PILATES: 'bg-aura-sand/30 text-aura-bark',
-    MEDITATION: 'bg-aura-paper text-aura-bark',
-    PRENATAL: 'bg-aura-sand/20 text-aura-bark',
-    POSTPARTUM: 'bg-aura-cream text-aura-bark',
+    YOGA: 'bg-aura-sand/15 text-aura-cream',
+    PILATES: 'bg-aura-clay/20 text-aura-cream',
+    MEDITATION: 'bg-aura-umber/30 text-aura-cream',
+    PRENATAL: 'bg-aura-sand/10 text-aura-cream',
+    POSTPARTUM: 'bg-aura-clay/15 text-aura-cream',
   };
 
   const handleBookClick = () => {
@@ -38,11 +38,11 @@ const ClassCard: React.FC<ClassCardProps> = ({ classItem, onBook, onJoinWaitlist
   };
 
   return (
-    <div className="bg-aura-ivory rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 border border-aura-sand/20">
+    <div className="bg-[#2c2014]/60 backdrop-blur-sm rounded-xl shadow-lg shadow-black/20 p-6 hover:shadow-xl transition-shadow duration-200 border border-aura-sand/10">
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-aura-bark mb-2">{classItem.name}</h3>
-          <p className="text-aura-umber text-sm mb-2">{classItem.description}</p>
+          <h3 className="text-lg font-semibold text-aura-cream mb-2">{classItem.name}</h3>
+          <p className="text-aura-sand text-sm mb-2">{classItem.description}</p>
         </div>
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${classTypeColors[classItem.classType as keyof typeof classTypeColors]}`}>
           {classItem.classType}
@@ -50,28 +50,28 @@ const ClassCard: React.FC<ClassCardProps> = ({ classItem, onBook, onJoinWaitlist
       </div>
 
       <div className="space-y-2 mb-4">
-        <div className="flex items-center text-sm text-aura-umber">
+        <div className="flex items-center text-sm text-aura-sand">
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
           {classItem.instructor}
         </div>
 
-        <div className="flex items-center text-sm text-aura-umber">
+        <div className="flex items-center text-sm text-aura-sand">
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           {format(new Date(classItem.date), 'MMM dd, yyyy')} at {classItem.time}
         </div>
 
-        <div className="flex items-center text-sm text-aura-umber">
+        <div className="flex items-center text-sm text-aura-sand">
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           {classItem.duration} minutes
         </div>
 
-        <div className="flex items-center text-sm text-aura-umber">
+        <div className="flex items-center text-sm text-aura-sand">
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
@@ -80,7 +80,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ classItem, onBook, onJoinWaitlist
       </div>
 
       <div className="flex items-center justify-between">
-        <div className={`text-sm font-medium ${classItem.isFullyBooked ? 'text-red-600' : 'text-green-600'}`}>
+        <div className={`text-sm font-medium ${classItem.isFullyBooked ? 'text-red-400' : 'text-green-400'}`}>
           {classItem.isFullyBooked ? 'Fully Booked' : `${classItem.availableSpots} spots left`}
         </div>
         
@@ -90,8 +90,8 @@ const ClassCard: React.FC<ClassCardProps> = ({ classItem, onBook, onJoinWaitlist
             disabled={onWaitlist}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
               onWaitlist
-                ? 'bg-amber-100 text-amber-700 cursor-default'
-                : 'bg-amber-500 text-white hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2'
+                ? 'bg-amber-900/30 text-amber-300 cursor-default'
+                : 'bg-amber-700 text-aura-cream hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2'
             }`}
           >
             {onWaitlist ? 'On Waitlist' : 'Join Waitlist'}

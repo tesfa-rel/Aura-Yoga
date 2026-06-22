@@ -61,11 +61,11 @@ const ResetPassword: React.FC = () => {
 
   if (!hasRecoveryToken) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-aura-ink via-[#2c2014] to-aura-bark py-12 px-4">
         <div className="max-w-md w-full text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Invalid or Expired Link</h2>
-          <p className="text-gray-600 mb-4">The reset link is missing or has expired.</p>
-          <Link to="/forgot-password" className="text-purple-600 hover:text-purple-500">
+          <h2 className="text-2xl font-bold text-aura-cream mb-4">Invalid or Expired Link</h2>
+          <p className="text-aura-sand mb-4">The reset link is missing or has expired.</p>
+          <Link to="/forgot-password" className="text-aura-sand hover:text-aura-cream">
             Request a new reset link
           </Link>
         </div>
@@ -74,21 +74,21 @@ const ResetPassword: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-aura-ink via-[#2c2014] to-aura-bark py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-aura-cream">
             Reset your password
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {message && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+            <div className="bg-green-900/30 border border-green-700/40 text-green-300 px-4 py-3 rounded backdrop-blur-sm">
               {message}
             </div>
           )}
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <div className="bg-red-900/30 border border-red-700/40 text-red-300 px-4 py-3 rounded backdrop-blur-sm">
               {error}
             </div>
           )}
@@ -100,7 +100,7 @@ const ResetPassword: React.FC = () => {
                 name="password"
                 type="password"
                 required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-aura-sand/20 placeholder:text-aura-sand/50 text-aura-cream focus:outline-none focus:ring-aura-sand focus:border-aura-sand focus:z-10 sm:text-sm bg-aura-ink/40"
                 placeholder="New password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -113,7 +113,7 @@ const ResetPassword: React.FC = () => {
                 name="confirmPassword"
                 type="password"
                 required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-aura-sand/20 placeholder:text-aura-sand/50 text-aura-cream focus:outline-none focus:ring-aura-sand focus:border-aura-sand focus:z-10 sm:text-sm bg-aura-ink/40"
                 placeholder="Confirm new password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -124,13 +124,13 @@ const ResetPassword: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-aura-ivory bg-aura-bark hover:bg-aura-umber focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aura-umber disabled:opacity-50"
             >
               {loading ? 'Resetting...' : 'Reset Password'}
             </button>
           </div>
           <div className="text-center">
-            <Link to="/login" className="text-sm text-purple-600 hover:text-purple-500">
+            <Link to="/login" className="text-sm text-aura-sand hover:text-aura-cream">
               Back to login
             </Link>
           </div>
