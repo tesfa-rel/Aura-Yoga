@@ -382,9 +382,9 @@ router.post('/instructor',
   authenticateToken,
   [
     body('name').notEmpty().withMessage('Name is required'),
-    body('email').isEmail().withMessage('Valid email is required'),
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-    body('phone').optional().isLength({ min: 10 }).withMessage('Valid phone number required')
+    body('email').optional({ checkFalsy: true }).isEmail().withMessage('Valid email is required'),
+    body('password').optional({ checkFalsy: true }).isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    body('phone').optional({ checkFalsy: true }).isLength({ min: 10 }).withMessage('Valid phone number required')
   ],
   async (req: AuthenticatedRequest, res: Response) => {
     try {
@@ -399,7 +399,18 @@ router.post('/instructor',
         return res.status(400).json({ error: errors.array()[0]?.msg || 'Validation failed' });
       }
 
-      const { name, email, password, phone } = req.body;
+      let { name, email, password, phone } = req.body;
+
+      // Auto-generate email if not provided
+      if (!email) {
+        const clean = name.toLowerCase().replace(/\s+/g, '.').replace(/[^a-z0-9.]/g, '');
+        email = `${clean}@aura.com`;
+      }
+
+      // Auto-generate password if not provided
+      if (!password) {
+        password = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+      }
 
       // Check if user already exists in Prisma or Supabase
       const existingUser = await prisma.user.findUnique({

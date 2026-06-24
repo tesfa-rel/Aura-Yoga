@@ -1,5 +1,6 @@
 import * as cron from 'node-cron';
 import { PackageExpiryService } from '../services/packageExpiryService';
+import { sendPackageExpiryReminder } from '../services/emailService';
 
 export class PackageExpiryScheduler {
   private static instance: PackageExpiryScheduler;
@@ -30,6 +31,24 @@ export class PackageExpiryScheduler {
         console.log('Running daily package expiry check...');
         await PackageExpiryService.checkAndExpirePackages();
         console.log('Package expiry check completed');
+
+        // Send reminder emails for packages expiring in 3 days
+        const expiringPackages = await PackageExpiryService.getExpiringPackages(3);
+        for (const up of expiringPackages) {
+          if (up.user?.email && up.expiresAt) {
+            const daysLeft = Math.ceil((new Date(up.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+            try {
+              await sendPackageExpiryReminder({
+                to: up.user.email,
+                userName: up.user.name,
+                packageName: up.package.name,
+                daysLeft: Math.max(0, daysLeft),
+              });
+            } catch (emailErr) {
+              console.error('Failed to send expiry reminder:', emailErr);
+            }
+          }
+        }
       } catch (error) {
         console.error('Error in scheduled package expiry check:', error);
       }

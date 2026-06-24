@@ -107,14 +107,14 @@ const PaymentUploadModal: React.FC<PaymentUploadModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div className="fixed inset-0 bg-black/60 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-aura-ink">
         <div className="mt-3">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">Upload Payment Receipt</h3>
+            <h3 className="text-lg font-medium text-aura-cream">Upload Payment Receipt</h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-500"
+              className="text-aura-sand/40 hover:text-aura-sand/70"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -123,10 +123,10 @@ const PaymentUploadModal: React.FC<PaymentUploadModalProps> = ({
           </div>
           
           <div className="mb-6">
-            <p className="text-sm text-gray-600 mb-4">Please upload your payment receipt for:</p>
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <h4 className="font-semibold text-purple-900 mb-2">{classInfo.name}</h4>
-              <div className="space-y-1 text-sm text-purple-700">
+            <p className="text-sm text-aura-sand/70 mb-4">Please upload your payment receipt for:</p>
+            <div className="bg-purple-900/20 p-4 rounded-lg">
+              <h4 className="font-semibold text-purple-200 mb-2">{classInfo.name}</h4>
+              <div className="space-y-1 text-sm text-purple-300">
                 <p>Instructor: {classInfo.instructor}</p>
                 <p>Date: {new Date(classInfo.date).toLocaleDateString()}</p>
                 <p>Time: {classInfo.time}</p>
@@ -138,13 +138,13 @@ const PaymentUploadModal: React.FC<PaymentUploadModalProps> = ({
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Payment Method Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-aura-sand mb-2">
                 Payment Method
               </label>
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                className="w-full px-3 py-2 border border-aura-sand/20 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500"
               >
                 {paymentMethods.map(method => (
                   <option key={method.value} value={method.value}>
@@ -156,9 +156,9 @@ const PaymentUploadModal: React.FC<PaymentUploadModalProps> = ({
 
             {/* Payment Details */}
             {paymentMethod === 'BANK_TRANSFER' && (
-              <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
-                <p className="text-xs font-medium text-gray-900 mb-1">Bank Transfer Details</p>
-                <div className="space-y-1 text-xs text-gray-600">
+              <div className="bg-aura-umber/30 border border-aura-sand/20 rounded-md p-3">
+                <p className="text-xs font-medium text-aura-cream mb-1">Bank Transfer Details</p>
+                <div className="space-y-1 text-xs text-aura-sand/70">
                   <p><strong>Account:</strong> {bankDetails.accountName}</p>
                   <p><strong>Bank:</strong> {bankDetails.bankName}</p>
                   <p><strong>Number:</strong> {bankDetails.accountNumber}</p>
@@ -168,10 +168,10 @@ const PaymentUploadModal: React.FC<PaymentUploadModalProps> = ({
 
             {/* Receipt Upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-aura-sand mb-2">
                 Payment Receipt *
               </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+              <div className="border-2 border-dashed border-aura-sand/20 rounded-lg p-4 text-center">
                 <input
                   type="file"
                   id="receipt"
@@ -185,16 +185,16 @@ const PaymentUploadModal: React.FC<PaymentUploadModalProps> = ({
                       <svg className="mx-auto h-12 w-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <p className="text-sm text-green-600">{receiptFile.name}</p>
-                      <p className="text-xs text-gray-500">Click to change file</p>
+                      <p className="text-sm text-green-400">{receiptFile.name}</p>
+                      <p className="text-xs text-aura-sand/50">Click to change file</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="mx-auto h-12 w-12 text-aura-sand/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                       </svg>
-                      <p className="text-sm text-gray-600">Click to upload receipt</p>
-                      <p className="text-xs text-gray-500">JPEG, PNG, GIF, or PDF (max 5MB)</p>
+                      <p className="text-sm text-aura-sand/70">Click to upload receipt</p>
+                      <p className="text-xs text-aura-sand/50">JPEG, PNG, GIF, or PDF (max 5MB)</p>
                     </div>
                   )}
                 </label>
@@ -203,7 +203,7 @@ const PaymentUploadModal: React.FC<PaymentUploadModalProps> = ({
 
             {/* Error Message */}
             {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded text-sm">
+              <div className="bg-red-900/60 border border-red-600/40 text-red-200 px-3 py-2 rounded text-sm">
                 {error}
               </div>
             )}
@@ -213,7 +213,7 @@ const PaymentUploadModal: React.FC<PaymentUploadModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className="px-4 py-2 text-aura-sand bg-aura-umber/40 rounded-md hover:bg-aura-umber/60 focus:outline-none focus:ring-2 focus:ring-aura-clay"
               >
                 Cancel
               </button>

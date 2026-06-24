@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface NavItem {
   id: string;
@@ -22,20 +22,27 @@ const TabletSidebar: React.FC<TabletSidebarProps> = ({
   onLogout,
 }) => {
   const [expanded, setExpanded] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = () => setShowProfileMenu(false);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   return (
     <aside
-      className="hidden md:flex lg:hidden flex-col h-screen sticky top-0 bg-aura-ivory border-r border-aura-sand/30 z-40 transition-all duration-300"
+      className="hidden md:flex lg:hidden flex-col h-screen sticky top-0 bg-aura-bark border-r border-aura-sand/10 z-40 transition-all duration-300"
       style={{ width: expanded ? 200 : 72 }}
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
     >
       {/* Logo */}
-      <div className="flex items-center justify-center h-16 border-b border-aura-sand/30 px-3">
+      <div className="flex items-center justify-center h-16 border-b border-aura-sand/10 px-3">
         {expanded ? (
-          <h1 className="text-lg font-bold text-aura-bark font-serif truncate">AURA</h1>
+          <h1 className="text-lg font-bold text-aura-ivory font-serif truncate">AURA</h1>
         ) : (
-          <span className="text-xl font-bold text-aura-bark font-serif">A</span>
+          <span className="text-xl font-bold text-aura-ivory font-serif">A</span>
         )}
       </div>
 
@@ -48,11 +55,11 @@ const TabletSidebar: React.FC<TabletSidebarProps> = ({
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={`
-                w-full flex items-center gap-3 px-2.5 py-2.5 rounded-lg text-sm font-medium
+                w-full flex items-center gap-3 px-2.5 py-2.5 rounded-lg text-sm font-medium font-sans
                 transition-colors duration-200 min-h-[44px]
                 ${isActive
-                  ? 'bg-aura-sand/20 text-aura-bark'
-                  : 'text-aura-umber hover:bg-aura-sand/10 hover:text-aura-ink'
+                  ? 'bg-aura-sand/20 text-aura-ivory'
+                  : 'text-aura-sand hover:bg-aura-umber/40 hover:text-aura-ivory'
                 }
               `}
               aria-current={isActive ? 'page' : undefined}
@@ -64,28 +71,53 @@ const TabletSidebar: React.FC<TabletSidebarProps> = ({
         })}
       </nav>
 
-      {/* User & Logout */}
-      <div className="p-2 border-t border-aura-sand/30">
-        {expanded && (
-          <div className="flex items-center gap-2 mb-2 px-2">
-            <div className="w-7 h-7 rounded-full bg-aura-sand/20 flex items-center justify-center flex-shrink-0">
-              <span className="text-xs font-semibold text-aura-bark">
-                {userName.charAt(0).toUpperCase()}
-              </span>
-            </div>
-            <span className="text-sm text-aura-umber truncate">{userName}</span>
+      {/* Profile Dropdown */}
+      <div className="p-2 border-t border-aura-sand/10 relative">
+        <button
+          onClick={(e) => { e.stopPropagation(); setShowProfileMenu(prev => !prev); }}
+          className="w-full flex items-center justify-center gap-2 px-2.5 py-2 hover:bg-aura-sand/10 rounded-lg transition-colors"
+          title={userName}
+        >
+          <div className="w-7 h-7 rounded-full bg-aura-sand/20 flex items-center justify-center flex-shrink-0">
+            <span className="text-xs font-semibold text-aura-ivory">
+              {userName.charAt(0).toUpperCase()}
+            </span>
+          </div>
+          {expanded && <span className="text-sm text-aura-sand truncate">{userName}</span>}
+        </button>
+        {showProfileMenu && (
+          <div className={`absolute bottom-full mb-2 bg-aura-ink border border-aura-sand/20 rounded-lg shadow-lg z-50 py-1 ${expanded ? 'left-2 right-2' : 'left-2 min-w-[170px]'}`}>
+            <button
+              onClick={() => { onTabChange(activeTab === 'home' ? 'admin-dashboard' : 'home'); setShowProfileMenu(false); }}
+              className="flex items-center w-full px-4 py-2 text-sm text-aura-cream hover:bg-aura-umber/30"
+            >
+              {activeTab === 'home' ? (
+                <>
+                  <svg className="w-4 h-4 mr-2 text-aura-sand flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                  Admin Dashboard
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 mr-2 text-aura-sand flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  Home
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => { onLogout(); setShowProfileMenu(false); }}
+              className="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-aura-umber/30"
+            >
+              <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
+            </button>
           </div>
         )}
-        <button
-          onClick={onLogout}
-          className="w-full flex items-center justify-center gap-2 px-2.5 py-2 text-sm font-medium text-aura-bark hover:bg-aura-sand/10 rounded-lg transition-colors min-h-[44px]"
-          title="Logout"
-        >
-          <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          {expanded && <span>Logout</span>}
-        </button>
       </div>
     </aside>
   );

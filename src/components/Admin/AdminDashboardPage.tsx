@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { Link } from 'react-router-dom';
 
 interface DashboardStats {
   totalUsers: number;
@@ -38,7 +37,11 @@ interface RecentPayment {
   };
 }
 
-const AdminDashboardPage: React.FC = () => {
+interface AdminDashboardPageProps {
+  onTabChange?: (tabId: string) => void;
+}
+
+const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onTabChange }) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentBookings, setRecentBookings] = useState<RecentBooking[]>([]);
   const [recentPayments, setRecentPayments] = useState<RecentPayment[]>([]);
@@ -93,14 +96,14 @@ const AdminDashboardPage: React.FC = () => {
     switch (status) {
       case 'CONFIRMED':
       case 'VERIFIED':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-900/40 text-green-200';
       case 'CANCELLED':
       case 'REJECTED':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-900/40 text-red-200';
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-amber-900/40 text-amber-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-aura-umber/40 text-aura-sand';
     }
   };
 
@@ -114,7 +117,7 @@ const AdminDashboardPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <div className="bg-red-900/60 border border-red-600/40 text-red-200 px-4 py-3 rounded">
         {error}
       </div>
     );
@@ -165,8 +168,8 @@ const AdminDashboardPage: React.FC = () => {
                 <p className="text-sm font-medium text-aura-sand">Total Bookings</p>
                 <p className="text-2xl font-bold text-aura-cream">{stats.totalBookings}</p>
               </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-green-900/40 p-3 rounded-full">
+                <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
@@ -179,8 +182,8 @@ const AdminDashboardPage: React.FC = () => {
                 <p className="text-sm font-medium text-aura-sand">Total Revenue</p>
                 <p className="text-2xl font-bold text-aura-cream">ETB {stats.totalRevenue.toLocaleString()}</p>
               </div>
-              <div className="bg-yellow-100 p-3 rounded-full">
-                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-amber-900/40 p-3 rounded-full">
+                <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -207,8 +210,8 @@ const AdminDashboardPage: React.FC = () => {
                 <p className="text-sm font-medium text-aura-sand">Pending Payments</p>
                 <p className="text-2xl font-bold text-aura-cream">{stats.pendingPayments}</p>
               </div>
-              <div className="bg-red-100 p-3 rounded-full">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-red-900/40 p-3 rounded-full">
+                <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -221,38 +224,38 @@ const AdminDashboardPage: React.FC = () => {
       <div className="bg-aura-ink rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold text-aura-cream mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link to="/admin/classes" className="block w-full text-left px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+          <button onClick={() => onTabChange && onTabChange('admin-classes')} className="block w-full text-left px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
             <div className="flex items-center">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               Create New Class
             </div>
-          </Link>
-          <Link to="/admin/packages" className="block w-full text-left px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+          </button>
+          <button onClick={() => onTabChange && onTabChange('admin-packages')} className="block w-full text-left px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
             <div className="flex items-center">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               Create New Package
             </div>
-          </Link>
-          <Link to="/admin/analytics" className="block w-full text-left px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+          </button>
+          <button onClick={() => onTabChange && onTabChange('admin-analytics')} className="block w-full text-left px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
             <div className="flex items-center">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002 2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002 2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
               </svg>
               View Analytics
             </div>
-          </Link>
-          <Link to="/admin/users" className="block w-full text-left px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+          </button>
+          <button onClick={() => onTabChange && onTabChange('admin-users')} className="block w-full text-left px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
             <div className="flex items-center">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
               Manage Users
             </div>
-          </Link>
+          </button>
         </div>
       </div>
 

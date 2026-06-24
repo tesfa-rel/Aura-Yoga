@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { format, isAfter, addDays } from 'date-fns';
+import { format, isAfter } from 'date-fns';
 
 interface Booking {
   id: string;

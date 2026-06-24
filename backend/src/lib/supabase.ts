@@ -1,14 +1,12 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
-
 let _supabase: SupabaseClient | undefined;
 let _supabaseAuth: SupabaseClient | undefined;
 
 function getSupabase(): SupabaseClient {
   if (!_supabase) {
+    const supabaseUrl = process.env.SUPABASE_URL || '';
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
     if (!supabaseUrl || !supabaseServiceKey) {
       throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set');
     }
@@ -21,6 +19,8 @@ function getSupabase(): SupabaseClient {
 
 function getSupabaseAuth(): SupabaseClient {
   if (!_supabaseAuth) {
+    const supabaseUrl = process.env.SUPABASE_URL || '';
+    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
     if (!supabaseUrl || !supabaseAnonKey) {
       throw new Error('SUPABASE_URL and SUPABASE_ANON_KEY must be set');
     }

@@ -78,6 +78,9 @@
 }
 .public-header .ph-btn-light { color: var(--ph-ivory); }
 .public-header .ph-btn-light:hover { background: var(--ph-ivory); color: var(--ph-bark); }
+.public-header .ph-btn-outline { color: var(--ph-sand); border-color: var(--ph-sand); }
+.public-header .ph-btn-outline:hover { background: var(--ph-sand); color: var(--ph-bark); }
+.public-header .ph-auth-btns { display: flex; gap: 0.6rem; align-items: center; }
 
 /* ---------- BURGER ---------- */
 .public-header .ph-burger {

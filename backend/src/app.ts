@@ -13,6 +13,8 @@ import adminRoutes from './routes/admin';
 import usersRoutes from './routes/users';
 import notificationsRoutes from './routes/notifications';
 import waitlistRoutes from './routes/waitlist';
+import contactRoutes from './routes/contact';
+import reviewsRoutes from './routes/reviews';
 
 dotenv.config();
 
@@ -47,6 +49,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/waitlist', waitlistRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/reviews', reviewsRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import { EyeIcon, PencilIcon, TrashIcon, ShieldCheckIcon, ExclamationTriangleIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 
 interface User {
   id: string;
@@ -31,6 +32,9 @@ const UserManagement: React.FC = () => {
   const [showEditForm, setShowEditForm] = useState(false);
   const [showRoleEdit, setShowRoleEdit] = useState(false);
   const [showInstructorForm, setShowInstructorForm] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [instructors, setInstructors] = useState<User[]>([]);
   const [editForm, setEditForm] = useState({
     name: '',
@@ -45,6 +49,12 @@ const UserManagement: React.FC = () => {
   });
 
   const roles = ['USER', 'ADMIN', 'INSTRUCTOR'];
+
+  useEffect(() => {
+    const handleClickOutside = () => setOpenDropdown(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     fetchUsers();
@@ -142,13 +152,22 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  const handleDeleteUser = async (userId: string) => {
-    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+  const openDeleteModal = (userId: string) => {
+    setDeleteTargetId(userId);
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteTargetId(null);
+    setShowDeleteModal(false);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deleteTargetId) return;
 
     try {
       const token = localStorage.getItem('token');
-      
-      const response = await fetch(`/api/admin/users/${userId}`, {
+      const response = await fetch(`/api/admin/users/${deleteTargetId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
@@ -163,6 +182,8 @@ const UserManagement: React.FC = () => {
       }
     } catch (err) {
       setError('Network error. Please try again.');
+    } finally {
+      closeDeleteModal();
     }
   };
 
@@ -200,13 +221,13 @@ const UserManagement: React.FC = () => {
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'ADMIN':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-purple-900/40 text-purple-200';
       case 'USER':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-900/40 text-blue-200';
       case 'INSTRUCTOR':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-900/40 text-green-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-aura-umber/40 text-aura-sand';
     }
   };
 
@@ -251,62 +272,53 @@ const UserManagement: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-        <p className="text-gray-600">Manage and monitor all users</p>
+        <h1 className="text-3xl font-bold text-aura-cream">User Management</h1>
+        <p className="text-aura-sand/70">Manage and monitor all users</p>
       </div>
 
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Users</h2>
-        <div className="flex space-x-2">
-          <button
-            onClick={() => setShowInstructorForm(true)}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-          >
-            Add Instructor
-          </button>
-          <span className="text-sm text-gray-500">
-            Showing {users.length} users
-          </span>
-        </div>
+        <h2 className="text-xl font-semibold text-aura-cream">Users</h2>
+        <span className="text-sm text-aura-sand/50">
+          Showing {users.length} users
+        </span>
       </div>
 
       {/* Messages */}
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        <div className="bg-green-900/60 border border-green-600/40 text-green-200 px-4 py-3 rounded">
           {successMessage}
         </div>
       )}
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-900/60 border border-red-600/40 text-red-200 px-4 py-3 rounded">
           {error}
-          <button onClick={() => setError('')} className="ml-4 text-green-700 hover:text-green-600">×</button>
+          <button onClick={() => setError('')} className="ml-4 text-green-300 hover:text-green-200">×</button>
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-lg font-semibold mb-4">Filter Users</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-aura-ink p-3 rounded-lg border border-aura-sand/10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <label className="block text-xs font-medium text-aura-sand/70 mb-0.5">Search</label>
             <input
               type="text"
               value={filter.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
-              placeholder="Search by name or email"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500"
+              placeholder="Name or email"
+              className="w-full px-2.5 py-1.5 text-sm bg-aura-bark text-aura-cream border border-aura-sand/20 rounded-md focus:outline-none focus:ring-purple-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+            <label className="block text-xs font-medium text-aura-sand/70 mb-0.5">Role</label>
             <select
               value={filter.role}
               onChange={(e) => handleFilterChange('role', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500"
+              className="w-full px-2.5 py-1.5 text-sm bg-aura-bark text-aura-cream border border-aura-sand/20 rounded-md focus:outline-none focus:ring-purple-500"
             >
-              <option value="">All Roles</option>
+              <option value="">All</option>
               {roles.map(role => (
                 <option key={role} value={role}>{role}</option>
               ))}
@@ -316,42 +328,42 @@ const UserManagement: React.FC = () => {
 
         <button
           onClick={() => setFilter({ search: '', role: '' })}
-          className="mt-4 text-sm text-purple-600 hover:text-purple-500"
+          className="mt-2 text-xs text-aura-clay hover:text-aura-sand"
         >
-          Clear all filters
+          Clear filters
         </button>
       </div>
 
       {/* Users Table */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
+      <div className="bg-aura-ink shadow rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-aura-sand/10">
+            <thead className="bg-aura-umber/30">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-aura-sand/50 uppercase tracking-wider">
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-aura-sand/50 uppercase tracking-wider">
                   Role
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-aura-sand/50 uppercase tracking-wider">
                   Activity
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-aura-sand/50 uppercase tracking-wider">
                   Joined
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-aura-sand/50 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-aura-ink divide-y divide-aura-sand/10">
               {users.map((user) => (
                 <tr key={user.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                      <div className="text-sm text-gray-500">{user.email}</div>
+                      <div className="text-sm font-medium text-aura-cream">{user.name}</div>
+                      <div className="text-sm text-aura-sand/50">{user.email}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -360,46 +372,58 @@ const UserManagement: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-aura-cream">
                       {user._count.bookings} bookings
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-aura-sand/50">
                       {user._count.payments} payments
                     </div>
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-aura-sand/40">
                       {user._count.userPackages} packages
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-aura-cream">
                       {format(new Date(user.createdAt), 'MMM dd, yyyy')}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => viewUserDetails(user)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-3"
-                    >
-                      View
-                    </button>
-                    <button
-                      onClick={() => handleEditUser(user)}
-                      className="text-blue-600 hover:text-blue-900 mr-3"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => setShowRoleEdit(true)}
-                      className="text-purple-600 hover:text-purple-900 mr-3"
-                    >
-                      Role
-                    </button>
-                    <button
-                      onClick={() => handleDeleteUser(user.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Delete
-                    </button>
+                    <div className="relative">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setOpenDropdown(prev => prev === user.id ? null : user.id); }}
+                        className="text-aura-sand hover:text-aura-cream p-1"
+                      >
+                        <EllipsisVerticalIcon className="w-5 h-5" />
+                      </button>
+                      {openDropdown === user.id && (
+                        <div className="absolute right-0 mt-1 w-40 bg-aura-ink border border-aura-sand/20 rounded-md shadow-lg z-50 py-1">
+                          <button
+                            onClick={() => { viewUserDetails(user); setOpenDropdown(null); }}
+                            className="flex items-center w-full px-4 py-2 text-sm text-aura-cream hover:bg-aura-umber/30"
+                          >
+                            <EyeIcon className="w-4 h-4 mr-2 text-indigo-400" /> View
+                          </button>
+                          <button
+                            onClick={() => { handleEditUser(user); setOpenDropdown(null); }}
+                            className="flex items-center w-full px-4 py-2 text-sm text-aura-cream hover:bg-aura-umber/30"
+                          >
+                            <PencilIcon className="w-4 h-4 mr-2 text-blue-400" /> Edit
+                          </button>
+                          <button
+                            onClick={() => { setShowRoleEdit(true); setOpenDropdown(null); }}
+                            className="flex items-center w-full px-4 py-2 text-sm text-aura-cream hover:bg-aura-umber/30"
+                          >
+                            <ShieldCheckIcon className="w-4 h-4 mr-2 text-purple-400" /> Role
+                          </button>
+                          <button
+                            onClick={() => { openDeleteModal(user.id); setOpenDropdown(null); }}
+                            className="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-aura-umber/30"
+                          >
+                            <TrashIcon className="w-4 h-4 mr-2" /> Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -409,52 +433,61 @@ const UserManagement: React.FC = () => {
 
         {users.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">No users found matching your criteria.</p>
+            <p className="text-aura-sand/50">No users found matching your criteria.</p>
           </div>
         )}
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200">
+          <div className="bg-aura-ink px-4 py-3 flex items-center justify-between border-t border-aura-sand/10">
             <div className="flex-1 flex justify-between sm:hidden">
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                className="relative inline-flex items-center px-4 py-2 border border-aura-sand/20 text-sm font-medium rounded-md text-aura-sand bg-aura-ink hover:bg-aura-umber/30 disabled:opacity-50"
               >
                 Previous
               </button>
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                className="relative inline-flex items-center px-4 py-2 border border-aura-sand/20 text-sm font-medium rounded-md text-aura-sand bg-aura-ink hover:bg-aura-umber/30 disabled:opacity-50"
               >
                 Next
               </button>
             </div>
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm text-gray-700">
-                  Showing page <span className="font-medium">{currentPage}</span> of{' '}
-                  <span className="font-medium">{totalPages}</span>
+                <p className="text-sm text-aura-sand">
+                  Page <span className="font-medium">{currentPage}</span> of <span className="font-medium">{totalPages}</span>
                 </p>
               </div>
               <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                   <button
                     onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-aura-sand/20 bg-aura-ink text-sm font-medium text-aura-sand hover:bg-aura-umber/30 disabled:opacity-50"
                   >
                     Previous
                   </button>
-                  <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                    {currentPage}
-                  </span>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                        page === currentPage
+                          ? 'z-10 bg-purple-600 border-purple-600 text-white'
+                          : 'bg-aura-ink border-aura-sand/20 text-aura-sand hover:bg-aura-umber/30'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
                   <button
                     onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                     disabled={currentPage === totalPages}
-                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-aura-sand/20 bg-aura-ink text-sm font-medium text-aura-sand hover:bg-aura-umber/30 disabled:opacity-50"
                   >
                     Next
                   </button>
@@ -467,25 +500,25 @@ const UserManagement: React.FC = () => {
 
       {/* User Details Modal */}
       {showDetails && selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-screen overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+          <div className="bg-aura-ink rounded-lg p-6 w-full max-w-2xl max-h-screen overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">User Details</h2>
             
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="font-semibold text-gray-900">Basic Information</h3>
-                  <p className="text-sm text-gray-600">Name: {selectedUser.name}</p>
-                  <p className="text-sm text-gray-600">Email: {selectedUser.email}</p>
-                  <p className="text-sm text-gray-600">Role: {selectedUser.role}</p>
+                  <h3 className="font-semibold text-aura-cream">Basic Information</h3>
+                  <p className="text-sm text-aura-sand/70">Name: {selectedUser.name}</p>
+                  <p className="text-sm text-aura-sand/70">Email: {selectedUser.email}</p>
+                  <p className="text-sm text-aura-sand/70">Role: {selectedUser.role}</p>
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold text-gray-900">Account Information</h3>
-                  <p className="text-sm text-gray-600">
+                  <h3 className="font-semibold text-aura-cream">Account Information</h3>
+                  <p className="text-sm text-aura-sand/70">
                     Joined: {format(new Date(selectedUser.createdAt), 'MMMM dd, yyyy')}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-aura-sand/70">
                     Updated: {format(new Date(selectedUser.updatedAt), 'MMMM dd, yyyy')}
                   </p>
                 </div>
@@ -493,10 +526,10 @@ const UserManagement: React.FC = () => {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="font-semibold text-gray-900">Activity Summary</h3>
-                  <p className="text-sm text-gray-600">Total Bookings: {selectedUser._count.bookings}</p>
-                  <p className="text-sm text-gray-600">Total Payments: {selectedUser._count.payments}</p>
-                  <p className="text-sm text-gray-600">
+                  <h3 className="font-semibold text-aura-cream">Activity Summary</h3>
+                  <p className="text-sm text-aura-sand/70">Total Bookings: {selectedUser._count.bookings}</p>
+                  <p className="text-sm text-aura-sand/70">Total Payments: {selectedUser._count.payments}</p>
+                  <p className="text-sm text-aura-sand/70">
                     Total Packages: {selectedUser._count.userPackages}
                   </p>
                 </div>
@@ -515,39 +548,68 @@ const UserManagement: React.FC = () => {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+          <div className="bg-aura-ink rounded-lg p-6 w-full max-w-sm">
+            <div className="flex items-center mb-4">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-900/60 flex items-center justify-center mr-3">
+                <ExclamationTriangleIcon className="w-6 h-6 text-red-400" />
+              </div>
+              <h3 className="text-lg font-bold text-aura-cream">Delete User</h3>
+            </div>
+            <p className="text-aura-sand mb-6">Are you sure you want to delete this user? This action cannot be undone.</p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={closeDeleteModal}
+                className="px-4 py-2 border border-aura-sand/20 rounded-md text-aura-sand hover:bg-aura-umber/30 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteUser}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Edit User Modal */}
       {showEditForm && selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+          <div className="bg-aura-ink rounded-lg p-6 w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">Edit User</h2>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label className="block text-sm font-medium text-aura-sand mb-1">Name</label>
                 <input
                   type="text"
                   value={editForm.name}
                   onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500"
+                  className="w-full px-3 py-2 bg-aura-bark text-aura-cream border border-aura-sand/20 rounded-md focus:outline-none focus:ring-purple-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-aura-sand mb-1">Email</label>
                 <input
                   type="email"
                   value={editForm.email}
                   onChange={(e) => setEditForm(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500"
+                  className="w-full px-3 py-2 bg-aura-bark text-aura-cream border border-aura-sand/20 rounded-md focus:outline-none focus:ring-purple-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                <label className="block text-sm font-medium text-aura-sand mb-1">Role</label>
                 <select
                   value={editForm.role}
                   onChange={(e) => setEditForm(prev => ({ ...prev, role: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500"
+                  className="w-full px-3 py-2 bg-aura-bark text-aura-cream border border-aura-sand/20 rounded-md focus:outline-none focus:ring-purple-500"
                 >
                   {roles.map(role => (
                     <option key={role} value={role}>{role}</option>
@@ -559,7 +621,7 @@ const UserManagement: React.FC = () => {
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowEditForm(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border-aura-sand/20 rounded-md text-aura-sand hover:bg-aura-umber/30"
               >
                 Cancel
               </button>
@@ -578,51 +640,51 @@ const UserManagement: React.FC = () => {
 
   {/* Add Instructor Modal */}
   {showInstructorForm && (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+      <div className="bg-aura-ink rounded-lg p-6 w-full max-w-md">
         <h2 className="text-xl font-bold mb-4">Add New Instructor</h2>
         
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <label className="block text-sm font-medium text-aura-sand mb-1">Name</label>
             <input
               type="text"
               value={instructorForm.name}
               onChange={(e) => setInstructorForm(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500"
+              className="w-full px-3 py-2 bg-aura-bark text-aura-cream border border-aura-sand/20 rounded-md focus:outline-none focus:ring-purple-500"
               placeholder="Enter instructor name"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-aura-sand mb-1">Email</label>
             <input
               type="email"
               value={instructorForm.email}
               onChange={(e) => setInstructorForm(prev => ({ ...prev, email: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500"
+              className="w-full px-3 py-2 bg-aura-bark text-aura-cream border border-aura-sand/20 rounded-md focus:outline-none focus:ring-purple-500"
               placeholder="Enter instructor email"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-aura-sand mb-1">Password</label>
             <input
               type="password"
               value={instructorForm.password}
               onChange={(e) => setInstructorForm(prev => ({ ...prev, password: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500"
+              className="w-full px-3 py-2 bg-aura-bark text-aura-cream border border-aura-sand/20 rounded-md focus:outline-none focus:ring-purple-500"
               placeholder="Enter instructor password"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <label className="block text-sm font-medium text-aura-sand mb-1">Phone</label>
             <input
               type="tel"
               value={instructorForm.phone}
               onChange={(e) => setInstructorForm(prev => ({ ...prev, phone: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500"
+              className="w-full px-3 py-2 bg-aura-bark text-aura-cream border border-aura-sand/20 rounded-md focus:outline-none focus:ring-purple-500"
               placeholder="Enter instructor phone"
             />
           </div>
@@ -631,7 +693,7 @@ const UserManagement: React.FC = () => {
         <div className="flex justify-end space-x-3 mt-6">
           <button
             onClick={() => setShowInstructorForm(false)}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            className="px-4 py-2 border border-aura-sand/20 rounded-md text-aura-sand hover:bg-aura-umber/30"
           >
             Cancel
           </button>

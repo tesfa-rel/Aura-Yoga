@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import './PublicHeader.css';
 
 const PublicHeader: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const isLandingPage = location.pathname === '/' || location.pathname === '/home';
@@ -15,6 +17,42 @@ const PublicHeader: React.FC = () => {
   const handleBook = () => {
     closeMenu();
     navigate('/classes');
+  };
+
+  const handleClasses = () => {
+    closeMenu();
+    navigate('/classes');
+  };
+
+  const handlePackages = () => {
+    closeMenu();
+    navigate('/packages');
+  };
+
+  const handleContact = () => {
+    closeMenu();
+    navigate('/contact');
+  };
+
+  const handleLogin = () => {
+    closeMenu();
+    navigate('/login');
+  };
+
+  const handleRegister = () => {
+    closeMenu();
+    navigate('/register');
+  };
+
+  const handleDashboard = () => {
+    closeMenu();
+    navigate('/dashboard');
+  };
+
+  const handleLogout = () => {
+    closeMenu();
+    logout();
+    navigate('/');
   };
 
   const handleLogoClick = () => {
@@ -82,8 +120,21 @@ const PublicHeader: React.FC = () => {
         <button onClick={() => handleNav('pilates')}>Pilates</button>
         <button onClick={() => handleNav('prenatal')}>Prenatal</button>
         <button onClick={() => handleNav('postpartum')}>Postpartum</button>
+        <button onClick={handleClasses}>Classes</button>
+        <button onClick={handlePackages}>Packages</button>
         <button onClick={() => handleNav('approach')}>About</button>
-        <button onClick={() => handleNav('footer')}>Contact</button>
+        <button onClick={handleContact}>Contact</button>
+        {user ? (
+          <>
+            <button onClick={handleDashboard}>Dashboard</button>
+            <button onClick={handleLogout}>Logout</button>
+          </>
+        ) : (
+          <>
+            <button onClick={handleLogin}>Login</button>
+            <button onClick={handleRegister}>Register</button>
+          </>
+        )}
         <a
           href="https://instagram.com/aurapilates"
           target="_blank"
@@ -105,12 +156,30 @@ const PublicHeader: React.FC = () => {
           <button onClick={() => handleNav('pilates')}>Pilates</button>
           <button onClick={() => handleNav('prenatal')}>Prenatal</button>
           <button onClick={() => handleNav('postpartum')}>Postpartum</button>
+          <button onClick={handleClasses}>Classes</button>
+          <button onClick={handlePackages}>Packages</button>
           <button onClick={() => handleNav('approach')}>About</button>
-          <button onClick={() => handleNav('footer')}>Contact</button>
+          <button onClick={handleContact}>Contact</button>
         </nav>
-        <button className="ph-btn ph-btn-light" onClick={handleBook}>
-          Book a Class
-        </button>
+        {user ? (
+          <div className="ph-auth-btns">
+            <button className="ph-btn ph-btn-light" onClick={handleDashboard}>
+              Dashboard
+            </button>
+            <button className="ph-btn ph-btn-outline" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        ) : (
+          <div className="ph-auth-btns">
+            <button className="ph-btn ph-btn-outline" onClick={handleLogin}>
+              Login
+            </button>
+            <button className="ph-btn ph-btn-light" onClick={handleBook}>
+              Book a Class
+            </button>
+          </div>
+        )}
         <button
           className={`ph-burger ${menuOpen ? 'ph-open' : ''}`}
           aria-label="Menu"

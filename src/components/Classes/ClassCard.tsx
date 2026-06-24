@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
 interface Class {
@@ -11,6 +12,7 @@ interface Class {
   duration: number;
   capacity: number;
   classType: string;
+  imageUrl?: string;
   availableSpots: number;
   isFullyBooked: boolean;
 }
@@ -23,6 +25,7 @@ interface ClassCardProps {
 }
 
 const ClassCard: React.FC<ClassCardProps> = ({ classItem, onBook, onJoinWaitlist, onWaitlist = false }) => {
+  const navigate = useNavigate();
   const classTypeColors = {
     PILATES: 'bg-aura-clay/20 text-aura-cream',
     PRENATAL: 'bg-aura-sand/10 text-aura-cream',
@@ -36,7 +39,13 @@ const ClassCard: React.FC<ClassCardProps> = ({ classItem, onBook, onJoinWaitlist
   };
 
   return (
-    <div className="bg-[#2c2014]/60 backdrop-blur-sm rounded-xl shadow-lg shadow-black/20 p-6 hover:shadow-xl transition-shadow duration-200 border border-aura-sand/10">
+    <div className="bg-aura-ink rounded-xl shadow-lg shadow-black/20 overflow-hidden hover:shadow-xl transition-shadow duration-200 border border-aura-sand/10">
+      {classItem.imageUrl && (
+        <div className="h-40 w-full bg-aura-bark cursor-pointer" onClick={() => navigate(`/classes/${classItem.id}`)}>
+          <img src={classItem.imageUrl} alt={classItem.name} className="w-full h-full object-cover" />
+        </div>
+      )}
+      <div className="p-6">
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-aura-cream mb-2">{classItem.name}</h3>
@@ -97,11 +106,12 @@ const ClassCard: React.FC<ClassCardProps> = ({ classItem, onBook, onJoinWaitlist
         ) : (
           <button
             onClick={handleBookClick}
-            className="px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-aura-bark text-aura-ivory hover:bg-aura-umber focus:outline-none focus:ring-2 focus:ring-aura-umber focus:ring-offset-2"
+            className="px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
           >
             Book Now
           </button>
         )}
+      </div>
       </div>
     </div>
   );

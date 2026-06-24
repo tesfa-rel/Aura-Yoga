@@ -7,6 +7,7 @@ interface User {
   name: string;
   role: string;
   phone?: string;
+  createdAt?: string;
 }
 
 interface AuthContextType {
@@ -15,6 +16,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (userData: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  updateUser: (user: User) => void;
   loading: boolean;
 }
 
@@ -128,6 +131,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/dashboard` },
+    });
+    if (error) {
+      throw new Error(error.message);
+    }
+    // OAuth redirect happens; session will be restored on callback
+  };
+
+  const updateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
   const logout = async () => {
     try {
       await fetch('/api/auth/logout', {
@@ -154,6 +173,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     register,
     logout,
+    signInWithGoogle,
+    updateUser,
     loading,
   };
 

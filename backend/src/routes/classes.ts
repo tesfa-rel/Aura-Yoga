@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { query } from 'express-validator';
 import { prisma } from '../lib/prisma';
+import { authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -138,6 +139,48 @@ router.get('/types/list', async (req: Request, res: Response) => {
     res.json(types);
   } catch (error) {
     console.error('Error fetching class types:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get classes for logged-in instructor
+router.get('/instructor/my-classes', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const authReq = req as any;
+    const user = authReq.user;
+    if (!user) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+    // Look up the instructor's name from the users table
+    const instructorUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { name: true },
+    });
+    if (!instructorUser) {
+      return res.status(404).json({ error: 'Instructor not found' });
+    }
+    const classes = await prisma.class.findMany({
+      where: {
+        instructor: instructorUser.name,
+        date: { gte: new Date() },
+      },
+      orderBy: [{ date: 'asc' }, { time: 'asc' }],
+      include: {
+        bookings: {
+          where: { status: { not: 'CANCELLED' } },
+          include: {
+            user: { select: { name: true, email: true } },
+          },
+        },
+      },
+    });
+    const result = classes.map(cls => ({
+      ...cls,
+      availableSpots: cls.capacity - cls.bookings.length,
+    }));
+    res.json(result);
+  } catch (error) {
+    console.error('Error fetching instructor classes:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

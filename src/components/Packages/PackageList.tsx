@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSEO } from '../../hooks/useSEO';
 import PackageCard from './PackageCard';
 
 interface Package {
@@ -29,18 +30,24 @@ const CATEGORY_LABELS: Record<string, string> = {
   PILATES: 'Pilates',
   PRENATAL: 'Prenatal',
   POSTPARTUM: 'Postpartum',
-  ALL: 'General',
 };
 
 const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) => {
+  useSEO({ title: 'Packages — AURA Yoga' });
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [packages, setPackages] = useState<Package[]>([]);
   const [userPackages, setUserPackages] = useState<UserPackage[]>([]);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [classTypeFilter, setClassTypeFilter] = useState<string>('');
+  const [sessionsFilter, setSessionsFilter] = useState<string>('');
+  const [priceFilter, setPriceFilter] = useState<string>('');
+  const [validityFilter, setValidityFilter] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 9;
 
   const fetchData = useCallback(async () => {
     try {
@@ -49,7 +56,9 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
       const packagesResponse = await fetch('/api/packages/available');
       if (packagesResponse.ok) {
         const packagesData = await packagesResponse.json();
-        setPackages(packagesData);
+        setPackages(Array.isArray(packagesData) ? packagesData : []);
+      } else {
+        setError(`Failed to load packages (${packagesResponse.status}). Please try again.`);
       }
 
       const token = localStorage.getItem('token');
@@ -70,6 +79,14 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
       setLoading(false);
     }
   }, [showUserPackages]);
+
+  // Sync URL classType param with filter state
+  useEffect(() => {
+    const urlType = searchParams.get('classType');
+    if (urlType) {
+      setClassTypeFilter(urlType.toUpperCase());
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     fetchData();
@@ -114,18 +131,36 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
     }
   };
 
-  // Filter by selected category
-  const filteredPackages = selectedCategory === 'ALL'
-    ? packages
-    : packages.filter(pkg => pkg.classType === selectedCategory || pkg.classType === 'ALL');
+  // Apply all filters (case-insensitive for backwards compatibility)
+  const filteredPackages = packages.filter(pkg => {
+    const pkgType = (pkg.classType || 'ALL').toUpperCase();
+    if (classTypeFilter && pkgType !== classTypeFilter) return false;
 
-  // Group packages by classType
-  const groupedPackages = filteredPackages.reduce<Record<string, Package[]>>((acc, pkg) => {
-    const type = pkg.classType || 'ALL';
-    if (!acc[type]) acc[type] = [];
-    acc[type].push(pkg);
-    return acc;
-  }, {});
+    if (sessionsFilter) {
+      if (sessionsFilter === 'unlimited') {
+        if (pkg.sessionsCount !== 999 && pkg.sessionsCount < 100) return false;
+      } else {
+        if (pkg.sessionsCount !== parseInt(sessionsFilter, 10)) return false;
+      }
+    }
+
+    if (priceFilter) {
+      if (priceFilter === 'under5000' && pkg.price >= 5000) return false;
+      if (priceFilter === '5000to10000' && (pkg.price < 5000 || pkg.price > 10000)) return false;
+      if (priceFilter === 'over10000' && pkg.price <= 10000) return false;
+    }
+
+    if (validityFilter) {
+      if (validityFilter === 'unlimited') {
+        if (pkg.validityDays) return false;
+      } else {
+        const days = parseInt(validityFilter, 10);
+        if (pkg.validityDays !== days) return false;
+      }
+    }
+
+    return true;
+  });
 
   // Combine available packages with user packages for rendering
   const packagesWithUserPackages = (pkgs: Package[]) => pkgs.map(pkg => {
@@ -163,7 +198,7 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
       )}
 
       {/* Header */}
-      <div className="text-center">
+      <div>
         <h2 className="text-2xl font-bold text-aura-cream mb-2">
           {showUserPackages ? 'My Packages' : 'Available Packages'}
         </h2>
@@ -199,22 +234,79 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
         </div>
       )}
 
-      {/* Category Filter */}
+      {/* Filters */}
       {!showUserPackages && (
-        <div className="flex flex-wrap gap-2 justify-center">
-          {['ALL', 'PILATES', 'PRENATAL', 'POSTPARTUM'].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                selectedCategory === cat
-                  ? 'bg-aura-bark text-aura-ivory'
-                  : 'bg-aura-ink text-aura-sand hover:bg-aura-bark border border-aura-sand/10'
-              }`}
-            >
-              {CATEGORY_LABELS[cat] || cat}
-            </button>
-          ))}
+        <div className="bg-aura-ink p-3 rounded-lg border border-aura-sand/10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div>
+              <label htmlFor="pkg-classType" className="block text-xs font-medium text-aura-sand/70 mb-0.5">Type</label>
+              <select
+                id="pkg-classType"
+                value={classTypeFilter}
+                onChange={(e) => { setClassTypeFilter(e.target.value); setCurrentPage(1); }}
+                className="w-full px-2.5 py-1.5 text-sm border border-aura-sand/30 rounded-md focus:outline-none focus:ring-aura-sand focus:border-aura-sand bg-aura-bark text-aura-cream placeholder:text-aura-sand/70"
+              >
+                <option value="">All</option>
+                <option value="PILATES">Pilates</option>
+                <option value="PRENATAL">Prenatal</option>
+                <option value="POSTPARTUM">Postpartum</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="pkg-sessions" className="block text-xs font-medium text-aura-sand/70 mb-0.5">Sessions</label>
+              <select
+                id="pkg-sessions"
+                value={sessionsFilter}
+                onChange={(e) => { setSessionsFilter(e.target.value); setCurrentPage(1); }}
+                className="w-full px-2.5 py-1.5 text-sm border border-aura-sand/30 rounded-md focus:outline-none focus:ring-aura-sand focus:border-aura-sand bg-aura-bark text-aura-cream placeholder:text-aura-sand/70"
+              >
+                <option value="">All</option>
+                <option value="1">1 (Drop-in)</option>
+                <option value="4">4 Pack</option>
+                <option value="8">8 Pack</option>
+                <option value="12">12 Pack</option>
+                <option value="unlimited">Unlimited</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="pkg-price" className="block text-xs font-medium text-aura-sand/70 mb-0.5">Price</label>
+              <select
+                id="pkg-price"
+                value={priceFilter}
+                onChange={(e) => { setPriceFilter(e.target.value); setCurrentPage(1); }}
+                className="w-full px-2.5 py-1.5 text-sm border border-aura-sand/30 rounded-md focus:outline-none focus:ring-aura-sand focus:border-aura-sand bg-aura-bark text-aura-cream placeholder:text-aura-sand/70"
+              >
+                <option value="">All</option>
+                <option value="under5000">Under ETB 5,000</option>
+                <option value="5000to10000">ETB 5,000 - 10,000</option>
+                <option value="over10000">Over ETB 10,000</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="pkg-validity" className="block text-xs font-medium text-aura-sand/70 mb-0.5">Validity</label>
+              <select
+                id="pkg-validity"
+                value={validityFilter}
+                onChange={(e) => { setValidityFilter(e.target.value); setCurrentPage(1); }}
+                className="w-full px-2.5 py-1.5 text-sm border border-aura-sand/30 rounded-md focus:outline-none focus:ring-aura-sand focus:border-aura-sand bg-aura-bark text-aura-cream placeholder:text-aura-sand/70"
+              >
+                <option value="">All</option>
+                <option value="7">7 Days</option>
+                <option value="30">30 Days</option>
+                <option value="90">90 Days</option>
+                <option value="unlimited">Unlimited</option>
+              </select>
+            </div>
+          </div>
+          <button
+            onClick={() => { setClassTypeFilter(''); setSessionsFilter(''); setPriceFilter(''); setValidityFilter(''); setCurrentPage(1); }}
+            className="mt-2 text-xs text-aura-sand/70 hover:text-aura-cream"
+          >
+            Clear filters
+          </button>
         </div>
       )}
 
@@ -226,28 +318,99 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
           </p>
         </div>
       ) : (
-        <div className="space-y-8">
-          {Object.entries(groupedPackages).map(([classType, pkgs]) => (
-            <div key={classType}>
-              {selectedCategory === 'ALL' && (
-                <h3 className="text-lg font-semibold text-aura-cream mb-4 font-serif">
-                  {CATEGORY_LABELS[classType] || classType}
-                </h3>
-              )}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {packagesWithUserPackages(pkgs).map(({ package: pkg, userPackage }) => (
-                  <PackageCard
-                    key={pkg.id}
-                    package={pkg}
-                    userPackage={userPackage}
-                    onPurchase={handlePurchase}
-                    loading={purchasing === pkg.id}
-                  />
-                ))}
+        <>
+          <div className="space-y-8">
+            {(() => {
+              const paginated = filteredPackages.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+              const grouped = paginated.reduce<Record<string, Package[]>>((acc, pkg) => {
+                const type = (pkg.classType || 'ALL').toUpperCase();
+                if (!acc[type]) acc[type] = [];
+                acc[type].push(pkg);
+                return acc;
+              }, {});
+              return Object.entries(grouped).map(([classType, pkgs]) => (
+                <div key={classType}>
+                  {classTypeFilter === '' && (
+                    <h3 className="text-lg font-semibold text-aura-cream mb-4 font-serif">
+                      {CATEGORY_LABELS[classType] || classType}
+                    </h3>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {packagesWithUserPackages(pkgs).map(({ package: pkg, userPackage }) => (
+                      <PackageCard
+                        key={pkg.id}
+                        package={pkg}
+                        userPackage={userPackage}
+                        onPurchase={handlePurchase}
+                        loading={purchasing === pkg.id}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ));
+            })()}
+          </div>
+
+          {/* Pagination */}
+          {filteredPackages.length > ITEMS_PER_PAGE && (
+            <div className="bg-aura-ink px-4 py-3 mt-6 flex items-center justify-between border border-aura-sand/10 rounded-lg">
+              <div className="flex-1 flex justify-between sm:hidden">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center px-4 py-2 border border-aura-sand/20 text-sm font-medium rounded-md text-aura-sand bg-aura-ink hover:bg-aura-umber/30 disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(Math.ceil(filteredPackages.length / ITEMS_PER_PAGE), prev + 1))}
+                  disabled={currentPage === Math.ceil(filteredPackages.length / ITEMS_PER_PAGE)}
+                  className="relative inline-flex items-center px-4 py-2 border border-aura-sand/20 text-sm font-medium rounded-md text-aura-sand bg-aura-ink hover:bg-aura-umber/30 disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-aura-sand">
+                    Showing <span className="font-medium">{((currentPage - 1) * ITEMS_PER_PAGE) + 1}</span> to <span className="font-medium">{Math.min(currentPage * ITEMS_PER_PAGE, filteredPackages.length)}</span> of <span className="font-medium">{filteredPackages.length}</span> results
+                  </p>
+                </div>
+                <div>
+                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-aura-sand/20 bg-aura-ink text-sm font-medium text-aura-sand hover:bg-aura-umber/30 disabled:opacity-50"
+                    >
+                      Previous
+                    </button>
+                    {Array.from({ length: Math.ceil(filteredPackages.length / ITEMS_PER_PAGE) }, (_, i) => i + 1).map(page => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                          page === currentPage
+                            ? 'z-10 bg-purple-600 border-purple-600 text-white'
+                            : 'bg-aura-ink border-aura-sand/20 text-aura-sand hover:bg-aura-umber/30'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.min(Math.ceil(filteredPackages.length / ITEMS_PER_PAGE), prev + 1))}
+                      disabled={currentPage === Math.ceil(filteredPackages.length / ITEMS_PER_PAGE)}
+                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-aura-sand/20 bg-aura-ink text-sm font-medium text-aura-sand hover:bg-aura-umber/30 disabled:opacity-50"
+                    >
+                      Next
+                    </button>
+                  </nav>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

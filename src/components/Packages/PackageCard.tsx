@@ -62,7 +62,7 @@ const PackageCard: React.FC<PackageCardProps> = ({
   };
 
   return (
-    <div className="bg-[#2c2014]/60 backdrop-blur-sm rounded-xl shadow-lg shadow-black/20 p-6 hover:shadow-xl transition-shadow duration-200 border border-aura-sand/10">
+    <div className="bg-aura-ink rounded-xl shadow-lg shadow-black/20 p-6 hover:shadow-xl transition-shadow duration-200 border border-aura-sand/10">
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
@@ -125,12 +125,12 @@ const PackageCard: React.FC<PackageCardProps> = ({
           <button
             onClick={handlePurchaseClick}
             disabled={loading || !pkg.isActive}
-            className={`w-full px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+            className={`w-full px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
               !pkg.isActive
-                ? 'bg-aura-sand/20 text-aura-clay cursor-not-allowed'
+                ? 'bg-purple-300/40 text-purple-200 cursor-not-allowed'
                 : loading
-                ? 'bg-aura-bark text-aura-ivory cursor-wait'
-                : 'bg-aura-bark text-aura-ivory hover:bg-aura-umber focus:outline-none focus:ring-2 focus:ring-aura-umber focus:ring-offset-2'
+                ? 'bg-purple-500 text-white cursor-wait'
+                : 'bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2'
             }`}
           >
             {loading ? 'Processing...' : pkg.isActive ? 'Purchase Package' : 'Not Available'}

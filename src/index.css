@@ -26,6 +26,10 @@ body {
   color: var(--aura-ink);
 }
 
+input, select, textarea {
+  color-scheme: dark;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

@@ -122,20 +122,20 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
   if (success) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-          <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="bg-green-900/20 border border-green-700/30 rounded-lg p-6 text-center">
+        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-900/40 mb-4">
+          <svg className="h-6 w-6 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-green-900 mb-2">Payment Submitted!</h3>
-        <p className="text-green-700 mb-4">
+        <h3 className="text-lg font-medium text-green-200 mb-2">Payment Submitted!</h3>
+        <p className="text-green-300 mb-4">
           Your payment of ETB {amount.toLocaleString()} has been submitted for verification.
           We'll process it within 24 hours and notify you once it's approved.
         </p>
         <button
           onClick={() => setSuccess(false)}
-          className="text-green-600 hover:text-green-500 font-medium"
+          className="text-green-400 hover:text-green-300 font-medium"
         >
           Make another payment
         </button>
@@ -144,14 +144,14 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+    <div className="bg-aura-ink rounded-lg shadow-md p-6">
+      <h3 className="text-lg font-semibold text-aura-cream mb-4">
         Complete Payment - ETB {amount.toLocaleString()}
       </h3>
       
       {packageName && (
-        <div className="bg-purple-50 border border-purple-200 rounded-md p-3 mb-4">
-          <p className="text-sm text-purple-700">
+        <div className="bg-purple-900/20 border border-purple-700/30 rounded-md p-3 mb-4">
+          <p className="text-sm text-purple-300">
             <strong>Package:</strong> {packageName}
           </p>
         </div>
@@ -160,7 +160,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Payment Method Selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-aura-sand mb-2">
             Payment Method
           </label>
           <div className="space-y-2">
@@ -172,11 +172,11 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                   value={method.value}
                   checked={formData.paymentMethod === method.value}
                   onChange={handleInputChange}
-                  className="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+                  className="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-aura-sand/20"
                 />
                 <div className="ml-3">
-                  <span className="text-sm font-medium text-gray-900">{method.label}</span>
-                  <p className="text-xs text-gray-500">{method.description}</p>
+                  <span className="text-sm font-medium text-aura-cream">{method.label}</span>
+                  <p className="text-xs text-aura-sand/50">{method.description}</p>
                 </div>
               </label>
             ))}
@@ -185,15 +185,15 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
         {/* Bank Details for Bank Transfer */}
         {formData.paymentMethod === 'BANK_TRANSFER' && (
-          <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
-            <h4 className="font-medium text-gray-900 mb-2">Bank Transfer Details</h4>
+          <div className="bg-aura-umber/30 border border-aura-sand/20 rounded-md p-4">
+            <h4 className="font-medium text-aura-cream mb-2">Bank Transfer Details</h4>
             <div className="space-y-1 text-sm">
               <p><strong>Account Name:</strong> {bankDetails.accountName}</p>
               <p><strong>Bank:</strong> {bankDetails.bankName}</p>
               <p><strong>Account Number:</strong> {bankDetails.accountNumber}</p>
               <p><strong>Branch:</strong> {bankDetails.branch}</p>
             </div>
-            <p className="text-xs text-gray-600 mt-2">
+            <p className="text-xs text-aura-sand/70 mt-2">
               Please upload your transfer receipt after making the payment.
             </p>
           </div>
@@ -201,13 +201,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
         {/* Mobile Money Details */}
         {formData.paymentMethod === 'MOBILE_MONEY' && (
-          <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
-            <h4 className="font-medium text-gray-900 mb-2">Mobile Money Details</h4>
+          <div className="bg-aura-umber/30 border border-aura-sand/20 rounded-md p-4">
+            <h4 className="font-medium text-aura-cream mb-2">Mobile Money Details</h4>
             <div className="space-y-1 text-sm">
               <p><strong>Telebirr:</strong> +251 911 234 567</p>
               <p><strong>M-Pesa:</strong> +251 911 234 568</p>
             </div>
-            <p className="text-xs text-gray-600 mt-2">
+            <p className="text-xs text-aura-sand/70 mt-2">
               Please upload your transaction receipt after making the payment.
             </p>
           </div>
@@ -215,12 +215,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
         {/* Cash Payment Info */}
         {formData.paymentMethod === 'CASH' && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-            <h4 className="font-medium text-yellow-900 mb-2">Cash Payment</h4>
-            <p className="text-sm text-yellow-700">
+          <div className="bg-amber-900/20 border border-amber-700/30 rounded-md p-4">
+            <h4 className="font-medium text-amber-200 mb-2">Cash Payment</h4>
+            <p className="text-sm text-amber-300">
               Please visit our studio to make the cash payment. Our staff will verify your payment and activate your package immediately.
             </p>
-            <div className="mt-2 text-sm text-yellow-600">
+            <div className="mt-2 text-sm text-amber-400">
               <p><strong>Address:</strong> Bole, Addis Ababa</p>
               <p><strong>Hours:</strong> Mon-Sat 6AM-8PM, Sun 7AM-12PM</p>
             </div>
@@ -230,10 +230,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         {/* Receipt Upload */}
         {formData.paymentMethod !== 'CASH' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-aura-sand mb-2">
               Payment Receipt *
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+            <div className="border-2 border-dashed border-aura-sand/20 rounded-lg p-4 text-center">
               <input
                 type="file"
                 id="receipt"
@@ -248,15 +248,15 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <p className="text-sm text-green-600">{formData.receipt.name}</p>
-                    <p className="text-xs text-gray-500">Click to change file</p>
+                    <p className="text-xs text-aura-sand/50">Click to change file</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="mx-auto h-12 w-12 text-aura-sand/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
-                    <p className="text-sm text-gray-600">Click to upload receipt</p>
-                    <p className="text-xs text-gray-500">JPEG, PNG, GIF, or PDF (max 5MB)</p>
+                    <p className="text-sm text-aura-sand/70">Click to upload receipt</p>
+                    <p className="text-xs text-aura-sand/50">JPEG, PNG, GIF, or PDF (max 5MB)</p>
                   </div>
                 )}
               </label>
@@ -266,7 +266,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded text-sm">
+          <div className="bg-red-900/60 border border-red-600/40 text-red-200 px-3 py-2 rounded text-sm">
             {error}
           </div>
         )}

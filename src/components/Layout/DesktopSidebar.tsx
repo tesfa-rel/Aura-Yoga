@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface NavItem {
   id: string;
@@ -21,11 +21,19 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
   userName,
   onLogout,
 }) => {
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = () => setShowProfileMenu(false);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   return (
-    <aside className="hidden lg:flex flex-col w-64 h-screen sticky top-0 bg-aura-ivory border-r border-aura-sand/30 z-40">
+    <aside className="hidden lg:flex flex-col w-64 h-screen sticky top-0 bg-aura-bark border-r border-aura-sand/10 z-40">
       {/* Logo */}
-      <div className="flex items-center h-16 px-6 border-b border-aura-sand/30">
-        <h1 className="text-xl font-bold text-aura-bark font-serif">AURA</h1>
+      <div className="flex items-center h-16 px-6 border-b border-aura-sand/10">
+        <h1 className="text-xl font-bold text-aura-ivory font-serif">AURA</h1>
       </div>
 
       {/* Navigation */}
@@ -37,11 +45,11 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={`
-                w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium font-sans
                 transition-colors duration-200 min-h-[44px]
                 ${isActive
-                  ? 'bg-aura-sand/20 text-aura-bark'
-                  : 'text-aura-umber hover:bg-aura-sand/10 hover:text-aura-ink'
+                  ? 'bg-aura-sand/20 text-aura-ivory'
+                  : 'text-aura-sand hover:bg-aura-umber/40 hover:text-aura-ivory'
                 }
               `}
               aria-current={isActive ? 'page' : undefined}
@@ -53,25 +61,52 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
         })}
       </nav>
 
-      {/* User & Logout */}
-      <div className="p-4 border-t border-aura-sand/30">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 rounded-full bg-aura-sand/20 flex items-center justify-center">
-            <span className="text-sm font-semibold text-aura-bark">
+      {/* Profile Dropdown */}
+      <div className="p-4 border-t border-aura-sand/10 relative">
+        <button
+          onClick={(e) => { e.stopPropagation(); setShowProfileMenu(prev => !prev); }}
+          className="flex items-center gap-3 w-full hover:bg-aura-sand/10 rounded-lg p-2 transition-colors"
+        >
+          <div className="w-8 h-8 rounded-full bg-aura-sand/20 flex items-center justify-center flex-shrink-0">
+            <span className="text-sm font-semibold text-aura-ivory">
               {userName.charAt(0).toUpperCase()}
             </span>
           </div>
-          <span className="text-sm font-medium text-aura-umber truncate">{userName}</span>
-        </div>
-        <button
-          onClick={onLogout}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-aura-bark hover:bg-aura-sand/10 rounded-lg transition-colors min-h-[44px]"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          Logout
+          <span className="text-sm font-medium text-aura-sand truncate">{userName}</span>
         </button>
+        {showProfileMenu && (
+          <div className="absolute left-4 right-4 bottom-full mb-2 bg-aura-ink border border-aura-sand/20 rounded-lg shadow-lg z-50 py-1">
+            <button
+              onClick={() => { onTabChange(activeTab === 'home' ? 'admin-dashboard' : 'home'); setShowProfileMenu(false); }}
+              className="flex items-center w-full px-4 py-2 text-sm text-aura-cream hover:bg-aura-umber/30"
+            >
+              {activeTab === 'home' ? (
+                <>
+                  <svg className="w-4 h-4 mr-2 text-aura-sand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                  Admin Dashboard
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 mr-2 text-aura-sand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  Home
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => { onLogout(); setShowProfileMenu(false); }}
+              className="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-aura-umber/30"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

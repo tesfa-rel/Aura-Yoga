@@ -24,6 +24,7 @@ model User {
   userPackages     UserPackage[]
   payments         Payment[]
   waitlistEntries  WaitlistEntry[]
+  reviews          Review[]
 
   @@map("users")
 }
@@ -39,6 +40,7 @@ model Class {
   capacity    Int
   classType   String   @default("YOGA")
   price       Float?
+  imageUrl    String?
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -46,6 +48,7 @@ model Class {
   // Relations
   bookings         Booking[]
   waitlistEntries  WaitlistEntry[]
+  reviews          Review[]
 
   @@map("classes")
 }
@@ -148,6 +151,22 @@ model WaitlistEntry {
 
   @@unique([userId, classId])
   @@map("waitlist_entries")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  classId   String
+  rating    Int      @default(5)
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, classId])
+  @@map("reviews")
 }
 
 // Note: SQLite doesn't support enums, using strings instead

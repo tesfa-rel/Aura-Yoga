@@ -21,6 +21,10 @@ import BookingManagement from './components/Admin/BookingManagement';
 import PackageManagement from './components/Admin/PackageManagement';
 import PaymentManagement from './components/Admin/PaymentManagement';
 import AdminDashboard from './components/Admin/AdminDashboard';
+import Analytics from './components/Admin/Analytics';
+import MarketingDashboard from './components/Admin/MarketingDashboard';
+import ClassDetail from './components/Classes/ClassDetail';
+import ContactPage from './components/Homepage/ContactPage';
 import NotificationSettings from './components/Notifications/NotificationSettings';
 import { register } from './utils/serviceWorkerRegistration';
 import './App.css';
@@ -67,6 +71,22 @@ function AppRoutes() {
           </PublicLayout>
         }
       />
+      <Route
+        path="/classes/:id"
+        element={
+          <PublicLayout>
+            <ClassDetail />
+          </PublicLayout>
+        }
+      />
+      <Route
+        path="/contact"
+        element={
+          <PublicLayout>
+            <ContactPage />
+          </PublicLayout>
+        }
+      />
 
       {/* Protected dashboard */}
       <Route
@@ -84,7 +104,7 @@ function AppRoutes() {
       <Route
         path="/admin/classes"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute adminOnly>
             <Navigation />
             <main className="pt-16">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -97,7 +117,7 @@ function AppRoutes() {
       <Route
         path="/admin/users"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute adminOnly>
             <Navigation />
             <main className="pt-16">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -110,7 +130,7 @@ function AppRoutes() {
       <Route
         path="/admin/bookings"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute adminOnly>
             <Navigation />
             <main className="pt-16">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -123,7 +143,7 @@ function AppRoutes() {
       <Route
         path="/admin/packages"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute adminOnly>
             <Navigation />
             <main className="pt-16">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -136,11 +156,11 @@ function AppRoutes() {
       <Route
         path="/admin/analytics"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute adminOnly>
             <Navigation />
             <main className="pt-16">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-                <PaymentManagement />
+                <Analytics />
               </div>
             </main>
           </ProtectedRoute>
@@ -149,11 +169,11 @@ function AppRoutes() {
       <Route
         path="/admin/marketing"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute adminOnly>
             <Navigation />
             <main className="pt-16">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-                <AdminDashboard />
+                <MarketingDashboard />
               </div>
             </main>
           </ProtectedRoute>

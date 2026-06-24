@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useSEO } from '../../hooks/useSEO';
 import './LandingPage.css';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  useSEO();
 
   // Scroll reveal animation
   useEffect(() => {
@@ -48,10 +50,6 @@ const LandingPage: React.FC = () => {
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
-  };
-
-  const logoClick = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -191,9 +189,9 @@ const LandingPage: React.FC = () => {
           </div>
           <div>
             <h4>Follow</h4>
-            <a href="#" onClick={(e) => e.preventDefault()}>Instagram</a>
-            <a href="#" onClick={(e) => e.preventDefault()}>Facebook</a>
-            <a href="#" onClick={(e) => e.preventDefault()}>Email</a>
+            <button className="link-button" onClick={(e) => e.preventDefault()}>Instagram</button>
+            <button className="link-button" onClick={(e) => e.preventDefault()}>Facebook</button>
+            <button className="link-button" onClick={(e) => e.preventDefault()}>Email</button>
           </div>
           <div>
             <h4>Stay Connected</h4>

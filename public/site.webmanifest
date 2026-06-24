@@ -1,7 +1,7 @@
 {
-  "name": "AURA Yoga Studio",
-  "short_name": "AURA Yoga",
-  "description": "Book yoga and pilates classes at AURA Yoga Studio. Women-only classes with expert instructors.",
+  "name": "AURA Studio",
+  "short_name": "AURA Pilates",
+  "description": "Book pilates classes at AURA Studio. Women-only classes with expert instructors.",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",

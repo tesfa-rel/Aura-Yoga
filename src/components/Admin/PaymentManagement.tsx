@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import { EyeIcon, CheckCircleIcon, XCircleIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 
 interface Payment {
   id: string;
@@ -23,6 +24,7 @@ interface Payment {
 
 const PaymentManagement: React.FC = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -35,6 +37,12 @@ const PaymentManagement: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = () => setOpenDropdown(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     fetchPayments();
@@ -106,26 +114,26 @@ const PaymentManagement: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'VERIFIED':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-900/40 text-green-200';
       case 'REJECTED':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-900/40 text-red-200';
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-amber-900/40 text-amber-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-aura-umber/40 text-aura-sand';
     }
   };
 
   const getPaymentMethodColor = (method: string) => {
     switch (method) {
       case 'BANK_TRANSFER':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-900/40 text-blue-200';
       case 'MOBILE_MONEY':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-purple-900/40 text-purple-200';
       case 'CASH':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-900/40 text-green-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-aura-umber/40 text-aura-sand';
     }
   };
 
@@ -151,36 +159,36 @@ const PaymentManagement: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Payment Management</h1>
-        <p className="text-gray-600">Review and verify payment transactions</p>
+        <h1 className="text-3xl font-bold text-aura-cream">Payment Management</h1>
+        <p className="text-aura-sand/70">Review and verify payment transactions</p>
       </div>
 
       {/* Messages */}
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        <div className="bg-green-900/60 border border-green-600/40 text-green-200 px-4 py-3 rounded">
           {successMessage}
         </div>
       )}
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-900/60 border border-red-600/40 text-red-200 px-4 py-3 rounded">
           {error}
-          <button onClick={() => setError('')} className="ml-4 text-green-700 hover:text-green-600">×</button>
+          <button onClick={() => setError('')} className="ml-4 text-green-300 hover:text-green-200">×</button>
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="bg-aura-ink p-3 rounded-lg border border-aura-sand/10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <label className="block text-xs font-medium text-aura-sand/70 mb-0.5">Status</label>
             <select
               name="status"
               value={filter.status}
               onChange={handleFilterChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500"
+              className="w-full px-2.5 py-1.5 text-sm bg-aura-bark text-aura-cream border border-aura-sand/20 rounded-md focus:outline-none focus:ring-purple-500"
             >
-              <option value="">All Status</option>
+              <option value="">All</option>
               <option value="PENDING">Pending</option>
               <option value="VERIFIED">Verified</option>
               <option value="REJECTED">Rejected</option>
@@ -188,83 +196,83 @@ const PaymentManagement: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+            <label className="block text-xs font-medium text-aura-sand/70 mb-0.5">Method</label>
             <select
               name="paymentMethod"
               value={filter.paymentMethod}
               onChange={handleFilterChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500"
+              className="w-full px-2.5 py-1.5 text-sm bg-aura-bark text-aura-cream border border-aura-sand/20 rounded-md focus:outline-none focus:ring-purple-500"
             >
-              <option value="">All Methods</option>
-              <option value="BANK_TRANSFER">Bank Transfer</option>
-              <option value="MOBILE_MONEY">Mobile Money</option>
+              <option value="">All</option>
+              <option value="BANK_TRANSFER">Bank</option>
+              <option value="MOBILE_MONEY">Mobile</option>
               <option value="CASH">Cash</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <label className="block text-xs font-medium text-aura-sand/70 mb-0.5">Search</label>
             <input
               type="text"
               name="search"
               value={filter.search}
               onChange={handleFilterChange}
-              placeholder="Search by name or email"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500"
+              placeholder="Name or email"
+              className="w-full px-2.5 py-1.5 text-sm bg-aura-bark text-aura-cream border border-aura-sand/20 rounded-md focus:outline-none focus:ring-purple-500"
             />
           </div>
 
           <div className="flex items-end">
             <button
               onClick={() => setFilter({ status: '', paymentMethod: '', search: '' })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              className="w-full px-2.5 py-1.5 text-sm border border-aura-sand/20 rounded-md text-aura-sand hover:bg-aura-umber/30"
             >
-              Clear Filters
+              Clear
             </button>
           </div>
         </div>
       </div>
 
       {/* Payments Table */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
+      <div className="bg-aura-ink shadow rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-aura-sand/10">
+            <thead className="bg-aura-umber/30">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-aura-sand/50 uppercase tracking-wider">
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-aura-sand/50 uppercase tracking-wider">
                   Amount
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-aura-sand/50 uppercase tracking-wider">
                   Method
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-aura-sand/50 uppercase tracking-wider">
                   Package
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-aura-sand/50 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-aura-sand/50 uppercase tracking-wider">
                   Date
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-aura-sand/50 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-aura-ink divide-y divide-aura-sand/10">
               {payments.map((payment) => (
                 <tr key={payment.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{payment.user.name}</div>
-                      <div className="text-sm text-gray-500">{payment.user.email}</div>
+                      <div className="text-sm font-medium text-aura-cream">{payment.user.name}</div>
+                      <div className="text-sm text-aura-sand/50">{payment.user.email}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">ETB {payment.amount.toLocaleString()}</div>
+                    <div className="text-sm font-medium text-aura-cream">ETB {payment.amount.toLocaleString()}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPaymentMethodColor(payment.paymentMethod)}`}>
@@ -272,7 +280,7 @@ const PaymentManagement: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-aura-cream">
                       {payment.package?.name || 'N/A'}
                     </div>
                   </td>
@@ -282,36 +290,48 @@ const PaymentManagement: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-aura-cream">
                       {format(new Date(payment.createdAt), 'MMM dd, yyyy')}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-aura-sand/50">
                       {format(new Date(payment.createdAt), 'HH:mm')}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => viewPaymentDetails(payment)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-3"
-                    >
-                      View
-                    </button>
-                    {payment.status === 'PENDING' && (
-                      <>
-                        <button
-                          onClick={() => handleVerifyPayment(payment.id, 'VERIFIED')}
-                          className="text-green-600 hover:text-green-900 mr-3"
-                        >
-                          Verify
-                        </button>
-                        <button
-                          onClick={() => handleVerifyPayment(payment.id, 'REJECTED')}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
+                    <div className="relative">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setOpenDropdown(prev => prev === payment.id ? null : payment.id); }}
+                        className="text-aura-sand hover:text-aura-cream p-1"
+                      >
+                        <EllipsisVerticalIcon className="w-5 h-5" />
+                      </button>
+                      {openDropdown === payment.id && (
+                        <div className="absolute right-0 mt-1 w-40 bg-aura-ink border border-aura-sand/20 rounded-md shadow-lg z-50 py-1">
+                          <button
+                            onClick={() => { viewPaymentDetails(payment); setOpenDropdown(null); }}
+                            className="flex items-center w-full px-4 py-2 text-sm text-aura-cream hover:bg-aura-umber/30"
+                          >
+                            <EyeIcon className="w-4 h-4 mr-2 text-indigo-400" /> View
+                          </button>
+                          {payment.status === 'PENDING' && (
+                            <>
+                              <button
+                                onClick={() => { handleVerifyPayment(payment.id, 'VERIFIED'); setOpenDropdown(null); }}
+                                className="flex items-center w-full px-4 py-2 text-sm text-aura-cream hover:bg-aura-umber/30"
+                              >
+                                <CheckCircleIcon className="w-4 h-4 mr-2 text-green-400" /> Verify
+                              </button>
+                              <button
+                                onClick={() => { handleVerifyPayment(payment.id, 'REJECTED'); setOpenDropdown(null); }}
+                                className="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-aura-umber/30"
+                              >
+                                <XCircleIcon className="w-4 h-4 mr-2" /> Reject
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -321,7 +341,7 @@ const PaymentManagement: React.FC = () => {
         
         {payments.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">No payments found</p>
+            <p className="text-aura-sand/50">No payments found</p>
           </div>
         )}
       </div>
@@ -332,7 +352,7 @@ const PaymentManagement: React.FC = () => {
           <button
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+            className="px-3 py-1 border border-aura-sand/20 rounded-md disabled:opacity-50"
           >
             Previous
           </button>
@@ -342,7 +362,7 @@ const PaymentManagement: React.FC = () => {
           <button
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+            className="px-3 py-1 border border-aura-sand/20 rounded-md disabled:opacity-50"
           >
             Next
           </button>
@@ -351,49 +371,49 @@ const PaymentManagement: React.FC = () => {
 
       {/* Payment Details Modal */}
       {showDetails && selectedPayment && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-screen overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+          <div className="bg-aura-ink rounded-lg p-6 w-full max-w-2xl max-h-screen overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">Payment Details</h2>
             
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="font-medium text-gray-900">User Information</h3>
-                  <p className="text-sm text-gray-600">{selectedPayment.user.name}</p>
-                  <p className="text-sm text-gray-600">{selectedPayment.user.email}</p>
+                  <h3 className="font-medium text-aura-cream">User Information</h3>
+                  <p className="text-sm text-aura-sand/70">{selectedPayment.user.name}</p>
+                  <p className="text-sm text-aura-sand/70">{selectedPayment.user.email}</p>
                 </div>
                 
                 <div>
-                  <h3 className="font-medium text-gray-900">Payment Information</h3>
-                  <p className="text-sm text-gray-600">Amount: ETB {selectedPayment.amount.toLocaleString()}</p>
-                  <p className="text-sm text-gray-600">Method: {selectedPayment.paymentMethod.replace('_', ' ')}</p>
-                  <p className="text-sm text-gray-600">Status: {selectedPayment.status}</p>
+                  <h3 className="font-medium text-aura-cream">Payment Information</h3>
+                  <p className="text-sm text-aura-sand/70">Amount: ETB {selectedPayment.amount.toLocaleString()}</p>
+                  <p className="text-sm text-aura-sand/70">Method: {selectedPayment.paymentMethod.replace('_', ' ')}</p>
+                  <p className="text-sm text-aura-sand/70">Status: {selectedPayment.status}</p>
                 </div>
               </div>
               
               {selectedPayment.package && (
                 <div>
-                  <h3 className="font-medium text-gray-900">Package Information</h3>
-                  <p className="text-sm text-gray-600">{selectedPayment.package.name}</p>
+                  <h3 className="font-medium text-aura-cream">Package Information</h3>
+                  <p className="text-sm text-aura-sand/70">{selectedPayment.package.name}</p>
                 </div>
               )}
               
               <div>
-                <h3 className="font-medium text-gray-900">Timeline</h3>
-                <p className="text-sm text-gray-600">Created: {format(new Date(selectedPayment.createdAt), 'MMM dd, yyyy HH:mm')}</p>
+                <h3 className="font-medium text-aura-cream">Timeline</h3>
+                <p className="text-sm text-aura-sand/70">Created: {format(new Date(selectedPayment.createdAt), 'MMM dd, yyyy HH:mm')}</p>
                 {selectedPayment.verifiedAt && (
-                  <p className="text-sm text-gray-600">Verified: {format(new Date(selectedPayment.verifiedAt), 'MMM dd, yyyy HH:mm')}</p>
+                  <p className="text-sm text-aura-sand/70">Verified: {format(new Date(selectedPayment.verifiedAt), 'MMM dd, yyyy HH:mm')}</p>
                 )}
               </div>
               
               {selectedPayment.receiptUrl && (
                 <div>
-                  <h3 className="font-medium text-gray-900">Receipt</h3>
+                  <h3 className="font-medium text-aura-cream">Receipt</h3>
                   <a 
                     href={selectedPayment.receiptUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 text-sm"
+                    className="text-blue-400 hover:text-blue-300 text-sm"
                   >
                     View Receipt
                   </a>
@@ -426,7 +446,7 @@ const PaymentManagement: React.FC = () => {
               )}
               <button
                 onClick={closeModal}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border-aura-sand/20 rounded-md text-aura-sand hover:bg-aura-umber/30"
               >
                 Close
               </button>

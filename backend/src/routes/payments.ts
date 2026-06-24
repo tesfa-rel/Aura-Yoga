@@ -89,6 +89,7 @@ router.post('/', authenticateToken, upload.single('receipt'), [
         paymentMethod,
         receiptUrl: receiptFile.filename,
         status: 'PENDING',
+        packageId: packageId || null,
       },
     });
 

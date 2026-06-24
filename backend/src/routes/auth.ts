@@ -2,6 +2,15 @@ import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
 import { supabase, supabaseAuth } from '../lib/supabase';
+import { authenticateToken } from '../middleware/auth';
+
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+  };
+}
 
 const router = express.Router();
 
@@ -165,6 +174,51 @@ router.get('/me', async (req: Request, res: Response) => {
     res.json({ user });
   } catch (error) {
     res.status(403).json({ error: 'Invalid token' });
+  }
+});
+
+// Update current user profile
+router.patch('/me', authenticateToken, [
+  body('name').optional().isLength({ min: 1, max: 100 }).withMessage('Name must be between 1 and 100 characters'),
+  body('email').optional().isEmail().withMessage('Valid email is required'),
+  body('phone').optional().isLength({ min: 10 }).withMessage('Valid phone number required'),
+], async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const userId = req.user!.id;
+    const { name, email, phone } = req.body;
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (email && email !== user.email) {
+      const existing = await prisma.user.findUnique({ where: { email } });
+      if (existing) {
+        return res.status(400).json({ error: 'Email is already taken' });
+      }
+    }
+
+    const updateData: any = {};
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
+    if (phone !== undefined) updateData.phone = phone;
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+      select: { id: true, email: true, name: true, phone: true, role: true, createdAt: true },
+    });
+
+    res.json({ user: updated });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

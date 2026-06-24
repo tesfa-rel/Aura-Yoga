@@ -15,11 +15,11 @@ interface MobileBottomNavProps {
 const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ tabs, activeTab, onTabChange }) => {
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-aura-ivory border-t border-aura-sand/30 md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-aura-bark border-t border-aura-sand/10 md:hidden"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       aria-label="Mobile navigation"
     >
-      <div className="flex items-center justify-around h-16">
+      <div className="flex items-center h-16 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -27,12 +27,12 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ tabs, activeTab, onTa
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={`
-                flex flex-col items-center justify-center flex-1 h-full
-                min-w-[44px] min-h-[44px]
-                transition-colors duration-200
+                flex flex-col items-center justify-center flex-shrink-0 h-full
+                min-w-[64px] min-h-[44px] px-2
+                transition-colors duration-200 font-sans
                 ${isActive
-                  ? 'text-aura-bark'
-                  : 'text-aura-umber hover:text-aura-ink'
+                  ? 'text-aura-ivory'
+                  : 'text-aura-sand hover:text-aura-ivory'
                 }
               `}
               aria-current={isActive ? 'page' : undefined}
