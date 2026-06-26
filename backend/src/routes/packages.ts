@@ -1,5 +1,7 @@
 import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
+import multer from 'multer';
+import path from 'path';
 import { prisma } from '../lib/prisma';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 
@@ -13,6 +15,35 @@ interface AuthenticatedRequest extends Request {
 }
 
 const router = express.Router();
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'payment-receipt-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|pdf/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Only JPEG, JPG, PNG, GIF, and PDF files are allowed'));
+    }
+  }
+});
 
 // Get all available packages (public) — optionally filter by classType
 router.get('/available', async (req: Request, res: Response) => {
@@ -55,7 +86,7 @@ router.get('/my-packages', authenticateToken, async (req: AuthenticatedRequest, 
 });
 
 // Purchase a package — creates a PENDING payment; admin must verify to activate
-router.post('/purchase', authenticateToken, [
+router.post('/purchase', authenticateToken, upload.single('paymentReceipt'), [
   body('packageId').notEmpty().withMessage('Package ID is required'),
   body('paymentMethod').isIn(['BANK_TRANSFER', 'MOBILE_MONEY', 'CASH']).withMessage('Invalid payment method'),
 ], async (req: AuthenticatedRequest, res: Response) => {
@@ -67,6 +98,7 @@ router.post('/purchase', authenticateToken, [
 
     const { packageId, paymentMethod } = req.body;
     const userId = req.user!.id;
+    const paymentReceiptFile = req.file;
 
     // Get package details
     const packageInfo = await prisma.package.findUnique({
@@ -81,6 +113,13 @@ router.post('/purchase', authenticateToken, [
       return res.status(400).json({ error: 'Package is not available' });
     }
 
+    // Validate payment receipt requirement for non-cash payments
+    if (paymentMethod !== 'CASH' && !paymentReceiptFile) {
+      return res.status(400).json({ error: 'Payment receipt is required for bank transfer and mobile money payments' });
+    }
+
+    const receiptUrl = paymentReceiptFile ? `/uploads/${paymentReceiptFile.filename}` : null;
+
     // Create a pending payment record for admin verification
     const payment = await prisma.payment.create({
       data: {
@@ -89,6 +128,7 @@ router.post('/purchase', authenticateToken, [
         paymentMethod: paymentMethod || 'BANK_TRANSFER',
         status: 'PENDING',
         packageId,
+        receiptUrl,
       },
     });
 

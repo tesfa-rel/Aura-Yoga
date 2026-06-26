@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface User {
@@ -16,7 +16,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (userData: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: (returnTo?: string) => Promise<void>;
   updateUser: (user: User) => void;
   loading: boolean;
 }
@@ -46,36 +46,70 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const restoringRef = useRef(false);
 
-  // Restore session from localStorage on mount, refreshing via Supabase if needed
+  // Restore session: handles OAuth redirect, persisted Supabase sessions, and email login
   useEffect(() => {
     const restoreSession = async () => {
-      const storedToken = localStorage.getItem('token');
-      const storedRefreshToken = localStorage.getItem('refreshToken');
-      const storedUser = localStorage.getItem('user');
+      if (restoringRef.current) return;
+      restoringRef.current = true;
 
-      if (storedToken && storedRefreshToken && storedUser) {
-        // Attempt to refresh the session so we always have a valid token
-        const { data, error } = await supabase.auth.setSession({
-          access_token: storedToken,
-          refresh_token: storedRefreshToken,
-        });
+      try {
+        // 1. Check if Supabase already has a session (OAuth redirect or persisted)
+        let { data: { session } } = await supabase.auth.getSession();
 
-        if (!error && data.session) {
-          const freshToken = data.session.access_token;
-          const freshRefresh = data.session.refresh_token;
-          localStorage.setItem('token', freshToken);
-          localStorage.setItem('refreshToken', freshRefresh);
-          setToken(freshToken);
-          setUser(JSON.parse(storedUser));
-        } else {
-          // Token is invalid/expired and can't be refreshed — clear everything
-          localStorage.removeItem('token');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('user');
+        // 2. If no session, try restoring from localStorage (email login)
+        if (!session) {
+          const storedToken = localStorage.getItem('token');
+          const storedRefreshToken = localStorage.getItem('refreshToken');
+
+          if (storedToken && storedRefreshToken) {
+            const { data, error } = await supabase.auth.setSession({
+              access_token: storedToken,
+              refresh_token: storedRefreshToken,
+            });
+
+            if (!error && data.session) {
+              session = data.session;
+            } else {
+              // Invalid/expired tokens — clear everything
+              localStorage.removeItem('token');
+              localStorage.removeItem('refreshToken');
+              localStorage.removeItem('user');
+            }
+          }
         }
+
+        // 3. If we have a valid session, sync with backend to get Prisma user profile
+        if (session) {
+          const response = await fetch('/api/auth/me', {
+            headers: {
+              'Authorization': `Bearer ${session.access_token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const { user: backendUser } = await response.json();
+            setToken(session.access_token);
+            setUser(backendUser);
+            localStorage.setItem('token', session.access_token);
+            localStorage.setItem('refreshToken', session.refresh_token);
+            localStorage.setItem('user', JSON.stringify(backendUser));
+          } else {
+            // Backend rejected token — sign out and clear
+            await supabase.auth.signOut();
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+          }
+        }
+      } catch (err) {
+        console.error('Session restore error:', err);
+      } finally {
+        setLoading(false);
+        restoringRef.current = false;
       }
-      setLoading(false);
     };
 
     restoreSession();
@@ -131,10 +165,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (returnTo?: string) => {
+    const redirectTo = `${window.location.origin}${returnTo || '/dashboard'}`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: { redirectTo },
     });
     if (error) {
       throw new Error(error.message);

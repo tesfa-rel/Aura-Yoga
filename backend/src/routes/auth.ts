@@ -47,7 +47,7 @@ async function ensureUserProfile(authUser: { id: string; email?: string | null; 
     }
   }
 
-  // 3. Create a brand-new profile
+  // 3. Create a brand-new profile (always USER — admin only set manually or via seed)
   const meta = authUser.user_metadata || {};
   user = await prisma.user.create({
     data: {
@@ -55,7 +55,7 @@ async function ensureUserProfile(authUser: { id: string; email?: string | null; 
       email,
       name: meta.name || meta.full_name || 'User',
       phone: meta.phone || null,
-      role: meta.role || 'USER',
+      role: 'USER',
     },
     select,
   });

@@ -13,20 +13,29 @@ const ResetPassword: React.FC = () => {
   const [hasRecoveryToken, setHasRecoveryToken] = useState(false);
 
   useEffect(() => {
-    // Supabase recovery links include access_token & refresh_token in the URL hash
-    // e.g. /reset-password#access_token=xxx&type=recovery
-    supabase.auth.onAuthStateChange((event: string, session: any) => {
-      if (event === 'PASSWORD_RECOVERY' && session) {
-        setHasRecoveryToken(true);
-      }
-    });
+    let unsubscribe: (() => void) | undefined;
 
-    // Also check if there's already a recovery session in the URL
-    supabase.auth.getSession().then(({ data }: { data: { session: any } }) => {
-      if (data.session) {
+    const setup = async () => {
+      // Listen for recovery events from Supabase
+      const { data } = supabase.auth.onAuthStateChange((event: string, session: any) => {
+        if (event === 'PASSWORD_RECOVERY' && session) {
+          setHasRecoveryToken(true);
+        }
+      });
+      unsubscribe = () => data.subscription.unsubscribe();
+
+      // Also check if there's already a recovery session in the URL
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (sessionData.session) {
         setHasRecoveryToken(true);
       }
-    });
+    };
+
+    setup();
+
+    return () => {
+      unsubscribe?.();
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

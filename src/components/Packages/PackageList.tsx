@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSEO } from '../../hooks/useSEO';
 import PackageCard from './PackageCard';
+import PurchaseModal from './PurchaseModal';
 
 interface Package {
   id: string;
@@ -48,6 +49,9 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
   const [validityFilter, setValidityFilter] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+  const [purchaseLoading, setPurchaseLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -92,41 +96,59 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
     fetchData();
   }, [fetchData]);
 
-  const handlePurchase = async (packageId: string) => {
+  const handlePurchase = (packageId: string) => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login?returnTo=/packages');
       return;
     }
 
-    try {
-      setPurchasing(packageId);
+    const pkg = packages.find(p => p.id === packageId);
+    if (pkg) {
+      setSelectedPackage(pkg);
+      setShowPurchaseModal(true);
       setError('');
+    }
+  };
+
+  const handleConfirmPurchase = async (paymentMethod: string, receiptFile?: File) => {
+    if (!selectedPackage) return;
+
+    try {
+      setPurchaseLoading(true);
+      setPurchasing(selectedPackage.id);
+      const token = localStorage.getItem('token');
+
+      const formData = new FormData();
+      formData.append('packageId', selectedPackage.id);
+      formData.append('paymentMethod', paymentMethod);
+      if (receiptFile) {
+        formData.append('paymentReceipt', receiptFile);
+      }
 
       const response = await fetch('/api/packages/purchase', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ packageId }),
+        body: formData,
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setSuccessMessage('Package purchased successfully!');
-        // Refresh user packages
+        setSuccessMessage(data.message || 'Purchase request submitted successfully!');
+        setShowPurchaseModal(false);
+        setSelectedPackage(null);
         fetchData();
-        
-        // Clear success message after 3 seconds
-        setTimeout(() => setSuccessMessage(''), 3000);
+        setTimeout(() => setSuccessMessage(''), 5000);
       } else {
         setError(data.error || 'Purchase failed');
       }
     } catch (err) {
       setError('Network error. Please try again.');
     } finally {
+      setPurchaseLoading(false);
       setPurchasing(null);
     }
   };
@@ -309,6 +331,15 @@ const PackageList: React.FC<PackageListProps> = ({ showUserPackages = false }) =
           </button>
         </div>
       )}
+
+      {/* Purchase Modal */}
+      <PurchaseModal
+        isOpen={showPurchaseModal}
+        onClose={() => { setShowPurchaseModal(false); setSelectedPackage(null); }}
+        onConfirm={handleConfirmPurchase}
+        packageInfo={selectedPackage}
+        loading={purchaseLoading}
+      />
 
       {/* Packages Grid */}
       {filteredPackages.length === 0 ? (
