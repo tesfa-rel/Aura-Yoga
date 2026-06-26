@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import { body, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
 import { supabase, supabaseAuth } from '../lib/supabase';
@@ -13,6 +14,15 @@ interface AuthenticatedRequest extends Request {
 }
 
 const router = express.Router();
+
+// Rate limiting for auth endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { error: 'Too many attempts, please try again after 15 minutes' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // Helper: ensure Prisma user profile exists for a Supabase auth user
 async function ensureUserProfile(authUser: { id: string; email?: string | null; user_metadata?: any }) {
@@ -54,7 +64,7 @@ async function ensureUserProfile(authUser: { id: string; email?: string | null; 
 }
 
 // Register
-router.post('/register', [
+router.post('/register', authLimiter, [
   body('email').isEmail().normalizeEmail(),
   body('name').trim().isLength({ min: 2 }),
   body('password').isLength({ min: 6 }),
@@ -117,7 +127,7 @@ router.post('/register', [
 });
 
 // Login
-router.post('/login', [
+router.post('/login', authLimiter, [
   body('email').isEmail().normalizeEmail(),
   body('password').exists(),
 ], async (req: Request, res: Response) => {
@@ -253,7 +263,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
 });
 
 // Forgot password — delegate to Supabase
-router.post('/forgot-password', [
+router.post('/forgot-password', authLimiter, [
   body('email').isEmail().normalizeEmail(),
 ], async (req: Request, res: Response) => {
   try {
