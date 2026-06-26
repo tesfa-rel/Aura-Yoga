@@ -3,11 +3,11 @@ import { useAuth } from '../contexts/AuthContext';
 import { Navigate, useLocation } from 'react-router-dom';
 import UserDashboard from './User/UserDashboard';
 import ProfilePage from './User/ProfilePage';
-import MyWaitlist from './User/MyWaitlist';
-import CalendarView from './Classes/CalendarView';
-import ClassList from './Classes/ClassList';
+// import MyWaitlist from './User/MyWaitlist';
+// import CalendarView from './Classes/CalendarView';
+// import ClassList from './Classes/ClassList';
 import PackageList from './Packages/PackageList';
-import BookingHistory from './Booking/BookingHistory';
+// import BookingHistory from './Booking/BookingHistory';
 import PaymentHistory from './Payment/PaymentHistory';
 import AdminDashboardPage from './Admin/AdminDashboardPage';
 import ClassManagement from './Admin/ClassManagement';
@@ -31,11 +31,11 @@ import {
   InstructorIcon,
   AnalyticsIcon,
   ProfileIcon,
-  WaitlistIcon,
-  CalendarIcon,
+  // WaitlistIcon,
+  // CalendarIcon,
 } from './Layout/TabIcons';
 
-type TabType = 'home' | 'classes' | 'packages' | 'bookings' | 'payments' | 'waitlist' | 'profile' | 'calendar' | 'admin-dashboard' | 'admin-classes' | 'admin-users' | 'admin-bookings' | 'admin-packages' | 'admin-payments' | 'admin-instructors' | 'admin-analytics';
+type TabType = 'home' | /* 'classes' | */ 'packages' | /* 'bookings' | */ 'payments' | /* 'waitlist' | */ 'profile' | /* 'calendar' | */ 'admin-dashboard' | 'admin-classes' | 'admin-users' | 'admin-bookings' | 'admin-packages' | 'admin-payments' | 'admin-instructors' | 'admin-analytics';
 
 interface TabDef {
   id: TabType;
@@ -62,7 +62,7 @@ const DashboardLayout: React.FC = () => {
     const isAdmin = user.role === 'ADMIN';
     const tabMap: Record<string, TabType> = isAdmin
       ? { home: 'admin-dashboard', dashboard: 'admin-dashboard', classes: 'admin-classes', packages: 'admin-packages', bookings: 'admin-bookings', users: 'admin-users', payments: 'admin-payments', instructors: 'admin-instructors', analytics: 'admin-analytics' }
-      : { home: 'home', classes: 'classes', packages: 'packages', bookings: 'bookings', payments: 'payments', waitlist: 'waitlist', profile: 'profile', calendar: 'calendar' };
+      : { home: 'home', /* classes: 'classes', */ packages: 'packages', /* bookings: 'bookings', */ payments: 'payments', /* waitlist: 'waitlist', */ profile: 'profile' /* , calendar: 'calendar' */ };
     const segments = location.pathname.split('/').filter(Boolean);
     const tab = segments.length > 1 ? segments[1] : null;
     if (tab && tabMap[tab]) {
@@ -76,12 +76,12 @@ const DashboardLayout: React.FC = () => {
 
   const userTabs: TabDef[] = useMemo(() => [
     { id: 'home', label: 'Home', icon: <HomeIcon className="w-5 h-5" /> },
-    { id: 'classes', label: 'Classes', icon: <ClassesIcon className="w-5 h-5" /> },
-    { id: 'calendar', label: 'Schedule', icon: <CalendarIcon className="w-5 h-5" /> },
+    // { id: 'classes', label: 'Classes', icon: <ClassesIcon className="w-5 h-5" /> },
+    // { id: 'calendar', label: 'Schedule', icon: <CalendarIcon className="w-5 h-5" /> },
     { id: 'packages', label: 'Packages', icon: <PackagesIcon className="w-5 h-5" /> },
-    { id: 'bookings', label: 'Bookings', icon: <BookingsIcon className="w-5 h-5" /> },
+    // { id: 'bookings', label: 'Bookings', icon: <BookingsIcon className="w-5 h-5" /> },
     { id: 'payments', label: 'Payments', icon: <PaymentsIcon className="w-5 h-5" /> },
-    { id: 'waitlist', label: 'Waitlist', icon: <WaitlistIcon className="w-5 h-5" /> },
+    // { id: 'waitlist', label: 'Waitlist', icon: <WaitlistIcon className="w-5 h-5" /> },
     { id: 'profile', label: 'Profile', icon: <ProfileIcon className="w-5 h-5" /> },
   ], []);
 
@@ -124,13 +124,13 @@ const DashboardLayout: React.FC = () => {
 
     const content = (() => {
       switch (activeTab) {
-        case 'classes': return <ClassList />;
+        // case 'classes': return <ClassList />;
         case 'packages': return <PackageList />;
-        case 'bookings': return <BookingHistory />;
+        // case 'bookings': return <BookingHistory />;
         case 'payments': return <PaymentHistory />;
-        case 'waitlist': return <MyWaitlist />;
+        // case 'waitlist': return <MyWaitlist />;
         case 'profile': return <ProfilePage />;
-        case 'calendar': return <CalendarView />;
+        // case 'calendar': return <CalendarView />;
         case 'admin-dashboard': return <AdminDashboardPage onTabChange={handleTabChange} />;
         case 'admin-classes': return <ClassManagement />;
         case 'admin-users': return <UserManagement />;

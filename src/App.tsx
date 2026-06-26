@@ -10,7 +10,7 @@ import Register from './components/Auth/Register';
 import ForgotPassword from './components/Auth/ForgotPassword';
 import ResetPassword from './components/Auth/ResetPassword';
 import DashboardLayout from './components/DashboardLayout';
-import ClassList from './components/Classes/ClassList';
+// import ClassList from './components/Classes/ClassList';
 import PackageList from './components/Packages/PackageList';
 import OfflineIndicator from './components/OfflineIndicator';
 import PWAInstallBanner from './components/PWAInstallBanner';
@@ -24,7 +24,7 @@ import PaymentManagement from './components/Admin/PaymentManagement';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import Analytics from './components/Admin/Analytics';
 import MarketingDashboard from './components/Admin/MarketingDashboard';
-import ClassDetail from './components/Classes/ClassDetail';
+// import ClassDetail from './components/Classes/ClassDetail';
 import ContactPage from './components/Homepage/ContactPage';
 import NotificationSettings from './components/Notifications/NotificationSettings';
 import { register } from './utils/serviceWorkerRegistration';
@@ -55,7 +55,9 @@ function AppRoutes() {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/home" element={<PublicLayout fullWidth><Homepage /></PublicLayout>} />
 
-      {/* Public class & package browsing (no login required) */}
+      {/* Public package browsing (no login required) */}
+      {/* Classes hidden for now — packages only */}
+      {/*
       <Route
         path="/classes"
         element={
@@ -65,18 +67,19 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/packages"
-        element={
-          <PublicLayout>
-            <PackageList />
-          </PublicLayout>
-        }
-      />
-      <Route
         path="/classes/:id"
         element={
           <PublicLayout>
             <ClassDetail />
+          </PublicLayout>
+        }
+      />
+      */}
+      <Route
+        path="/packages"
+        element={
+          <PublicLayout>
+            <PackageList />
           </PublicLayout>
         }
       />

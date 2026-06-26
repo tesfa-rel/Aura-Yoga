@@ -16,13 +16,15 @@ const PublicHeader: React.FC = () => {
 
   const handleBook = () => {
     closeMenu();
-    navigate('/classes');
+    navigate('/packages');
   };
 
+  /* Classes hidden for now — packages only
   const handleClasses = () => {
     closeMenu();
     navigate('/classes');
   };
+  */
 
   const handlePackages = () => {
     closeMenu();
@@ -77,13 +79,13 @@ const PublicHeader: React.FC = () => {
           navigate('/');
           break;
         case 'pilates':
-          navigate('/classes?classType=PILATES');
+          navigate('/packages');
           break;
         case 'prenatal':
-          navigate('/classes?classType=PRENATAL');
+          navigate('/packages');
           break;
         case 'postpartum':
-          navigate('/classes?classType=POSTPARTUM');
+          navigate('/packages');
           break;
         case 'approach':
           navigate('/');
@@ -117,7 +119,7 @@ const PublicHeader: React.FC = () => {
           <span></span>
         </button>
         <button onClick={() => handleNav('top')}>Home</button>
-        <button onClick={handleClasses}>Classes</button>
+        {/* <button onClick={handleClasses}>Classes</button> */}
         <button onClick={handlePackages}>Packages</button>
         <button onClick={() => handleNav('approach')}>About</button>
         <button onClick={handleContact}>Contact</button>
@@ -150,7 +152,7 @@ const PublicHeader: React.FC = () => {
         </button>
         <nav className="ph-links">
           <button onClick={() => handleNav('top')}>Home</button>
-          <button onClick={handleClasses}>Classes</button>
+          {/* <button onClick={handleClasses}>Classes</button> */}
           <button onClick={handlePackages}>Packages</button>
           <button onClick={() => handleNav('approach')}>About</button>
           <button onClick={handleContact}>Contact</button>
@@ -170,7 +172,7 @@ const PublicHeader: React.FC = () => {
               Login
             </button>
             <button className="ph-btn ph-btn-light" onClick={handleBook}>
-              Book a Class
+              View Packages
             </button>
           </div>
         )}

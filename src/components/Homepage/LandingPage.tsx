@@ -37,12 +37,8 @@ const LandingPage: React.FC = () => {
     }
   }, [location]);
 
-  const handleBook = (classType?: string) => {
-    if (classType) {
-      navigate(`/classes?classType=${classType}`);
-    } else {
-      navigate('/classes');
-    }
+  const handleBook = () => {
+    navigate('/packages');
   };
 
   const scrollTo = (id: string) => {
@@ -84,8 +80,8 @@ const LandingPage: React.FC = () => {
             </div>
             <h3>Pilates</h3>
             <p>Strengthen, lengthen, and connect through mindful movement.</p>
-            <button className="lp-learn" onClick={() => handleBook('PILATES')}>
-              Book Pilates &rarr;
+            <button className="lp-learn" onClick={() => handleBook()}>
+              View Packages &rarr;
             </button>
           </div>
 
@@ -95,8 +91,8 @@ const LandingPage: React.FC = () => {
             </div>
             <h3>Prenatal</h3>
             <p>Support your body and mind through every step of your pregnancy.</p>
-            <button className="lp-learn" onClick={() => handleBook('PRENATAL')}>
-              Book Prenatal &rarr;
+            <button className="lp-learn" onClick={() => handleBook()}>
+              View Packages &rarr;
             </button>
           </div>
 
@@ -106,8 +102,8 @@ const LandingPage: React.FC = () => {
             </div>
             <h3>Postpartum</h3>
             <p>Rebuild, restore and feel strong in your body again.</p>
-            <button className="lp-learn" onClick={() => handleBook('POSTPARTUM')}>
-              Book Postpartum &rarr;
+            <button className="lp-learn" onClick={() => handleBook()}>
+              View Packages &rarr;
             </button>
           </div>
         </div>
@@ -154,7 +150,7 @@ const LandingPage: React.FC = () => {
             <h4>Studio</h4>
             <button onClick={() => scrollTo('approach')}>About</button>
             <button onClick={() => scrollTo('approach')}>Our Approach</button>
-            <button onClick={() => handleBook()}>Reviews</button>
+            <button onClick={() => handleBook()}>Packages</button>
           </div>
           <div>
             <h4>Follow</h4>
