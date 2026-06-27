@@ -183,7 +183,7 @@ const DashboardLayout: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-aura-bark flex">
+      <div className="h-screen max-h-screen bg-aura-bark flex overflow-hidden">
         {/* Desktop Sidebar (lg+) */}
         <DesktopSidebar
           tabs={tabs}
@@ -222,16 +222,6 @@ const DashboardLayout: React.FC = () => {
                     {viewMode === 'admin' ? 'Admin' : 'User'}
                   </button>
                 )}
-                <button
-                  onClick={() => setShowMobileDrawer(true)}
-                  className="p-2 -ml-2 text-aura-sand hover:text-aura-ivory hover:bg-aura-sand/10 rounded-lg transition-colors touch-manipulation"
-                  aria-label="Open menu"
-                  type="button"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                </button>
                 <img src="/Aura-header-black.png" alt="AURA" className="h-7 w-auto" />
               </div>
               <div className="relative">
@@ -283,6 +273,23 @@ const DashboardLayout: React.FC = () => {
             </div>
           </header>
 
+          {/* Mobile Sub-header — hamburger menu below header in admin view */}
+          {isAdmin && viewMode === 'admin' && (
+            <div className="md:hidden bg-aura-bark/80 border-b border-aura-sand/10 px-4 py-2 flex items-center gap-3 z-30">
+              <button
+                onClick={() => setShowMobileDrawer(true)}
+                className="p-1.5 text-aura-sand hover:text-aura-ivory hover:bg-aura-sand/10 rounded-lg transition-colors touch-manipulation flex items-center gap-2"
+                aria-label="Open menu"
+                type="button"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                <span className="text-xs font-medium">Menu</span>
+              </button>
+            </div>
+          )}
+
           {/* Content */}
           <div ref={contentRef} className="flex-1 content-safe-bottom overflow-y-auto overscroll-contain">
             <Suspense fallback={
@@ -305,12 +312,12 @@ const DashboardLayout: React.FC = () => {
 
       {/* Mobile Drawer — outside flex layout to prevent iOS Safari fixed-position bugs */}
       {showMobileDrawer && (
-        <div className="md:hidden fixed inset-0 z-50 flex touch-manipulation">
+        <div className="md:hidden fixed top-14 left-0 right-0 bottom-0 z-50 flex touch-manipulation">
           <div
             className="flex-1 bg-black/50"
             onClick={() => setShowMobileDrawer(false)}
           />
-          <aside className="w-64 bg-aura-bark border-l border-aura-sand/10 flex flex-col h-full max-h-full safe-top">
+          <aside className="w-64 bg-aura-bark border-l border-aura-sand/10 flex flex-col h-full max-h-full">
             <div className="flex items-center justify-between h-14 px-4 border-b border-aura-sand/10 shrink-0">
               <h2 className="text-lg font-bold text-aura-ivory font-serif">Menu</h2>
               <button
@@ -324,6 +331,15 @@ const DashboardLayout: React.FC = () => {
               </button>
             </div>
             <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto overscroll-contain">
+              <button
+                onClick={() => { navigate('/'); setShowMobileDrawer(false); }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium font-sans transition-colors duration-200 min-h-[44px] text-aura-sand hover:bg-aura-umber/40 hover:text-aura-ivory"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span>Home</span>
+              </button>
               {tabs.map((tab) => {
                 const isActive = activeTab === tab.id;
                 return (
