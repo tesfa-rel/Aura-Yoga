@@ -88,8 +88,8 @@ const BookingModal: React.FC<BookingModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-aura-ink/50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border border-aura-sand/20 w-96 shadow-lg shadow-black/30 rounded-xl bg-[#2c2014]/90 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-aura-ink/50 overflow-y-auto h-full w-full z-[60] modal-scroll-safe">
+      <div className="relative top-20 mx-auto p-5 pb-24 md:pb-5 border border-aura-sand/20 w-full max-w-md shadow-lg shadow-black/30 rounded-xl bg-[#2c2014]/90 backdrop-blur-sm">
         <div className="mt-3">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium text-aura-cream">Confirm Booking</h3>

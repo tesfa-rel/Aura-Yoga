@@ -107,8 +107,8 @@ const PaymentUploadModal: React.FC<PaymentUploadModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-aura-ink">
+    <div className="fixed inset-0 bg-black/60 overflow-y-auto h-full w-full z-[60] modal-scroll-safe">
+      <div className="relative top-20 mx-auto p-5 pb-24 md:pb-5 border w-full max-w-md shadow-lg rounded-md bg-aura-ink">
         <div className="mt-3">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium text-aura-cream">Upload Payment Receipt</h3>

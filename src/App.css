@@ -149,6 +149,63 @@ html {
   }
 }
 
+/* === iOS Safari viewport height fixes === */
+@supports (-webkit-touch-callout: none) {
+  body,
+  #root,
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+  .fixed.inset-0 {
+    height: 100%;
+    max-height: 100%;
+  }
+  .h-screen {
+    height: -webkit-fill-available;
+  }
+}
+
+/* Touch manipulation — prevents iOS double-tap zoom delay */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* iOS smooth scrolling */
+.overflow-y-auto,
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent scroll chaining on iOS (stops pull-to-refresh inside scroll areas) */
+.overscroll-contain {
+  overscroll-behavior: contain;
+}
+
+/* Bottom padding for mobile nav + iOS safe area */
+.content-safe-bottom {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 768px) {
+  .content-safe-bottom {
+    padding-bottom: 0;
+  }
+}
+
+/* Modal scroll container — clears the fixed bottom tab bar on mobile */
+.modal-scroll-safe {
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 768px) {
+  .modal-scroll-safe {
+    padding-bottom: 1rem;
+  }
+}
+
+/* Safe-area-aware top padding for fixed headers/drawers on iPhone */
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
 /* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
