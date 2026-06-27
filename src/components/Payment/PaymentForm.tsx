@@ -28,10 +28,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   ];
 
   const bankDetails = {
-    accountName: 'AURA Pilates Studio',
-    bankName: 'Commercial Bank of Ethiopia',
-    accountNumber: '1000123456',
-    branch: 'Bole Branch',
+    accountName: 'AURA Pilates Studio (Helen Gebrehiwot)',
+    bankName: 'Commercial Bank of Ethiopia (CBE)',
+    accountNumber: '1000367937762',
+    branch: 'Addis Ababa',
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -204,8 +204,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           <div className="bg-aura-umber/30 border border-aura-sand/20 rounded-md p-4">
             <h4 className="font-medium text-aura-cream mb-2">Mobile Money Details</h4>
             <div className="space-y-1 text-sm">
-              <p><strong>Telebirr:</strong> +251 911 234 567</p>
-              <p><strong>M-Pesa:</strong> +251 911 234 568</p>
+              <p><strong>Telebirr:</strong> +251 900 410 603</p>
             </div>
             <p className="text-xs text-aura-sand/70 mt-2">
               Please upload your transaction receipt after making the payment.

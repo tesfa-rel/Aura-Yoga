@@ -34,10 +34,10 @@ const PaymentUploadModal: React.FC<PaymentUploadModalProps> = ({
   ];
 
   const bankDetails = {
-    accountName: 'AURA Pilates Studio',
-    bankName: 'Commercial Bank of Ethiopia',
-    accountNumber: '1000123456',
-    branch: 'Bole Branch',
+    accountName: 'AURA Pilates Studio (Helen Gebrehiwot)',
+    bankName: 'Commercial Bank of Ethiopia (CBE)',
+    accountNumber: '1000367937762',
+    branch: 'Addis Ababa',
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

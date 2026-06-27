@@ -45,10 +45,10 @@ const BookingModal: React.FC<BookingModalProps> = ({
   ];
 
   const bankDetails = {
-    accountName: 'AURA Pilates Studio',
-    bankName: 'Commercial Bank of Ethiopia',
-    accountNumber: '1000123456',
-    branch: 'Bole Branch',
+    accountName: 'AURA Pilates Studio (Helen Gebrehiwot)',
+    bankName: 'Commercial Bank of Ethiopia (CBE)',
+    accountNumber: '1000367937762',
+    branch: 'Addis Ababa',
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,8 +174,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
                 <div className="mt-3 bg-aura-ink/40 border border-aura-sand/20 rounded-md p-3">
                   <p className="text-xs font-medium text-aura-cream mb-1">Mobile Money Details</p>
                   <div className="space-y-1 text-xs text-aura-sand">
-                    <p><strong>Telebirr:</strong> +251 911 234 567</p>
-                    <p><strong>M-Pesa:</strong> +251 911 234 568</p>
+                    <p><strong>Telebirr:</strong> +251 900 410 603</p>
                   </div>
                 </div>
               )}
